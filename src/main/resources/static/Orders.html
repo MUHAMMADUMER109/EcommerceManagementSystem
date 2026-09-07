@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders — Z A M A R</title>
+    <link rel="stylesheet" href="css/Style.css?v=3">
+</head>
+<body>
+
+<div class="announcement-bar">Free delivery on orders above Rs. 5,000</div>
+
+<nav class="navbar">
+    <div class="nav-left">
+        <a href="Index.html" class="nav-link">Home</a>
+        <a href="Products.html" class="nav-link">Shop</a>
+    </div>
+    <a href="Index.html" class="logo">Z A M A R<span>Premium Menswear</span></a>
+    <div class="nav-right">
+        <a href="Wishlist.html" class="nav-link" id="navWishlist">♡ <span class="wishlist-count">0</span></a>
+        <a href="Orders.html" class="nav-link" id="navAccount">My Orders</a>
+        <a href="Profile.html" class="nav-link" id="navProfile">Profile</a>
+        <a href="Admin.html" class="nav-link hidden" id="navAdmin">Admin</a>
+        <a href="#" class="nav-link" id="navLogout" onclick="logout()">Logout</a>
+        <button class="nav-icon" onclick="openCart()">🛒<span class="cart-badge cart-count">0</span></button>
+    </div>
+</nav>
+
+<div class="container" style="padding-top:48px;padding-bottom:80px;">
+
+    <div class="flex-between mb-24" style="flex-wrap:wrap;gap:16px;">
+        <div>
+            <h1 style="font-family:'Playfair Display',serif;font-size:36px;font-weight:400;">My Orders</h1>
+            <p style="font-size:13px;color:var(--grey);margin-top:6px;">Track and manage your orders</p>
+        </div>
+        <a href="Products.html" class="btn btn-outline-dark btn-sm">Continue Shopping</a>
+    </div>
+
+    <div class="alert" id="alertMsg"></div>
+
+    <!-- Status Legend -->
+    <div class="status-legend" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;padding:16px;background:var(--cream);border:1px solid var(--border);">
+        <span style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--grey);margin-right:8px;align-self:center;">Status:</span>
+        <span class="badge badge-gold">Confirmed</span>
+        <span class="badge badge-dark">Processing</span>
+        <span class="badge badge-info">Shipped</span>
+        <span class="badge badge-success">Delivered</span>
+        <span class="badge badge-danger">Cancelled</span>
+    </div>
+
+    <div style="background:var(--white);border:1px solid var(--border);">
+        <div class="table-wrap">
+            <table class="tbl-orders">
+                <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Product</th>
+                    <th>Category</th>
+                    <th>Qty</th>
+                    <th>Total</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody id="ordersBody">
+                <tr><td colspan="8" style="text-align:center;padding:48px;color:var(--grey);">Loading orders...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- Cancel Confirm Modal -->
+<div class="modal-overlay" id="cancelModal">
+    <div class="modal" style="max-width:420px;">
+        <div class="modal-header">
+            <h3>Cancel Order</h3>
+            <button class="modal-close" onclick="closeModal('cancelModal')">✕</button>
+        </div>
+        <div class="modal-body">
+            <p style="font-size:14px;color:var(--grey);line-height:1.7;">Are you sure you want to cancel order <strong id="cancelOrderId"></strong>? This action cannot be undone and stock will be restored.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-danger" onclick="confirmCancel()">Yes, Cancel Order</button>
+            <button class="btn btn-outline-dark" onclick="closeModal('cancelModal')">Keep Order</button>
+        </div>
+    </div>
+</div>
+
+<!-- Cart Drawer -->
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+<div class="cart-drawer" id="cartDrawer">
+    <div class="cart-drawer-header">
+        <h3>Shopping Cart</h3>
+        <button class="cart-close" onclick="closeCart()">✕</button>
+    </div>
+    <div class="cart-drawer-body" id="cartDrawerBody"></div>
+    <div class="cart-drawer-footer" id="cartDrawerFooter" style="display:none;">
+        <div class="cart-subtotal"><span>Subtotal</span><span id="cartSubtotal">Rs. 0</span></div>
+        <div class="cart-total-row"><span>Total</span><span id="cartTotalAmt">Rs. 0</span></div>
+        <a href="Checkout.html" class="btn btn-dark btn-full" style="margin-bottom:10px;">Checkout</a>
+        <button class="btn btn-outline-dark btn-full" onclick="closeCart()">Continue Shopping</button>
+    </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="js/Main.js?v=3"></script>
+<script>
+    const user = getUser();
+    if (!user) { window.location.href = 'Login.html'; }
+
+    updateNav();
+    updateCartCount();
+    loadOrders();
+
+    let orderToCancel = null;
+
+    function loadOrders() {
+        fetch(`/api/orders/history/${user.id}`)
+            .then(r => r.json())
+            .then(orders => {
+                const tbody = document.getElementById('ordersBody');
+                if (!orders.length) {
+                    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:60px;color:var(--grey);">
+                        <div style="font-size:40px;margin-bottom:16px;">🛍️</div>
+                        <div style="font-family:'Playfair Display',serif;font-size:20px;margin-bottom:8px;">No orders yet</div>
+                        <div style="font-size:13px;">Start shopping to see your orders here</div>
+                        <a href="Products.html" class="btn btn-dark" style="margin-top:20px;display:inline-flex;">Shop Now</a>
+                    </td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = orders.map(o => {
+                    const status = o.status || 'Confirmed';
+                    const canCancel = status === 'Confirmed' || status === 'Processing';
+                    return `
+                    <tr>
+                        <td><strong>#${o.orderId}</strong></td>
+                        <td style="color:var(--black);font-weight:500;max-width:200px;">${o.productName}</td>
+                        <td><span class="badge badge-dark" style="font-size:9px;">${o.productCategory || '—'}</span></td>
+                        <td>${o.quantity}</td>
+                        <td style="font-weight:600;">Rs. ${Number(o.totalAmount).toLocaleString()}</td>
+                        <td style="white-space:nowrap;">${new Date(o.orderDate).toLocaleDateString('en-PK',{day:'numeric',month:'short',year:'numeric'})}</td>
+                        <td>${statusBadge(status)}</td>
+                        <td>
+                            ${canCancel
+                                ? `<button class="btn btn-danger btn-sm" onclick="openCancelModal(${o.orderId})">Cancel</button>`
+                                : `<span style="font-size:11px;color:var(--light-grey);">${status === 'Delivered' ? 'Delivered ✓' : '—'}</span>`}
+                        </td>
+                    </tr>`;
+                }).join('');
+            })
+            .catch(() => showAlert('alertMsg', 'Failed to load orders.', 'error'));
+    }
+
+    function openCancelModal(orderId) {
+        orderToCancel = orderId;
+        document.getElementById('cancelOrderId').textContent = '#' + orderId;
+        openModal('cancelModal');
+    }
+
+    function confirmCancel() {
+        if (!orderToCancel) return;
+        fetch(`/api/orders/cancel/${orderToCancel}`, { method: 'DELETE' })
+            .then(r => r.json())
+            .then(data => {
+                closeModal('cancelModal');
+                if (data.success) {
+                    showToast('✓ Order cancelled successfully');
+                    loadOrders();
+                } else {
+                    showAlert('alertMsg', data.message || 'Could not cancel order.', 'error');
+                }
+            })
+            .catch(() => {
+                closeModal('cancelModal');
+                showAlert('alertMsg', 'Server error. Try again.', 'error');
+            });
+    }
+</script>
+</body>
+</html>

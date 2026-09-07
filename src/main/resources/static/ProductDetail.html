@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product — Z A M A R</title>
+    <link rel="stylesheet" href="css/Style.css?v=3">
+</head>
+<body>
+
+<div class="announcement-bar">Free delivery on orders above Rs. 5,000</div>
+
+<nav class="navbar">
+    <div class="nav-left">
+        <a href="Index.html" class="nav-link">Home</a>
+        <a href="Products.html" class="nav-link">Shop All</a>
+    </div>
+    <a href="Index.html" class="logo">Z A M A R<span>Premium Menswear</span></a>
+    <div class="nav-right">
+        <a href="Login.html" class="nav-link" id="navLogin">Login</a>
+        <a href="Wishlist.html" class="nav-link" id="navWishlist">♡ <span class="wishlist-count">0</span></a>
+        <a href="Orders.html" class="nav-link hidden" id="navAccount">My Orders</a>
+        <a href="Profile.html" class="nav-link hidden" id="navProfile">Profile</a>
+        <a href="Admin.html" class="nav-link hidden" id="navAdmin">Admin</a>
+        <a href="#" class="nav-link hidden" id="navLogout" onclick="logout()">Logout</a>
+        <button class="nav-icon" onclick="openCart()">🛒<span class="cart-badge cart-count">0</span></button>
+    </div>
+</nav>
+
+<div class="container">
+    <!-- Breadcrumb -->
+    <div style="padding:20px 0 0;font-size:12px;color:var(--grey);">
+        <a href="Index.html" style="color:var(--grey);">Home</a>
+        <span style="margin:0 8px;">›</span>
+        <a href="Products.html" style="color:var(--grey);">Shop</a>
+        <span style="margin:0 8px;">›</span>
+        <span id="breadcrumbName" style="color:var(--black);">Product</span>
+    </div>
+
+    <div class="product-detail-grid">
+        <!-- Left: Image -->
+        <div>
+            <div class="product-detail-img" id="productImage">
+                <div style="font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--light-grey);">Loading...</div>
+            </div>
+        </div>
+
+        <!-- Right: Details -->
+        <div id="productInfo">
+            <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--grey);margin-bottom:12px;" id="detailCategory"></div>
+            <h1 style="font-family:'Playfair Display',serif;font-size:36px;font-weight:400;line-height:1.2;margin-bottom:16px;color:var(--black);" id="detailName">Loading...</h1>
+
+            <!-- Rating summary -->
+            <div class="rating-summary" id="ratingRow" style="margin-bottom:20px;">
+                <span class="stars" id="ratingStars">☆☆☆☆☆</span>
+                <span id="ratingText" style="color:var(--grey);font-size:12px;">No reviews yet</span>
+            </div>
+
+            <!-- Price -->
+            <div style="margin-bottom:24px;display:flex;align-items:center;gap:16px;" id="priceRow">
+                <span style="font-size:32px;font-weight:700;font-family:'Playfair Display',serif;color:var(--black);" id="detailPrice">—</span>
+            </div>
+
+            <!-- Description -->
+            <p style="font-size:14px;color:var(--grey);line-height:1.9;margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid var(--border);" id="detailDesc"></p>
+
+            <!-- Stock -->
+            <div style="margin-bottom:28px;" id="stockRow"></div>
+
+            <!-- Qty + Add to cart -->
+            <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px;" id="actionRow">
+                <div class="qty-controls" style="height:52px;">
+                    <button class="qty-btn" style="width:40px;height:52px;" onclick="changeDetailQty(-1)">−</button>
+                    <div class="qty-display" style="width:52px;height:52px;font-size:16px;" id="detailQty">1</div>
+                    <button class="qty-btn" style="width:40px;height:52px;" onclick="changeDetailQty(1)">+</button>
+                </div>
+                <button class="btn btn-dark" style="flex:1;height:52px;" id="addToCartBtn" onclick="addDetailToCart()">
+                    + Add to Cart
+                </button>
+            </div>
+
+            <button class="btn btn-outline-dark btn-full" id="wishlistBtn" onclick="toggleDetailWishlist()" style="margin-bottom:24px;">
+                ♡ Add to Wishlist
+            </button>
+
+            <!-- Features -->
+            <div style="padding:20px;background:var(--cream);border:1px solid var(--border);font-size:12px;color:var(--grey);line-height:2;">
+                <div>✓ &nbsp;Free delivery on orders above Rs. 5,000</div>
+                <div>✓ &nbsp;7-day easy returns</div>
+                <div>✓ &nbsp;100% authentic quality</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reviews Section -->
+    <div style="padding-bottom:80px;" id="reviewsSection">
+        <div style="border-top:2px solid var(--black);padding-top:48px;margin-top:8px;">
+            <h2 style="font-family:'Playfair Display',serif;font-size:28px;font-weight:400;margin-bottom:8px;">Customer Reviews</h2>
+            <p style="font-size:13px;color:var(--grey);margin-bottom:32px;">Share your experience with this product</p>
+
+            <div style="display:grid;grid-template-columns:280px 1fr;gap:40px;align-items:start;" id="reviewsGrid">
+                <!-- Rating Summary -->
+                <div style="background:var(--white);border:1px solid var(--border);padding:28px;text-align:center;">
+                    <div class="rating-avg" id="avgRating">—</div>
+                    <div class="stars" id="avgStars" style="font-size:24px;margin:8px 0;">☆☆☆☆☆</div>
+                    <div style="font-size:12px;color:var(--grey);" id="reviewCountText">No reviews yet</div>
+                </div>
+
+                <!-- Review List -->
+                <div id="reviewList">
+                    <div style="text-align:center;padding:40px;color:var(--grey);">Loading reviews...</div>
+                </div>
+            </div>
+
+            <!-- Write Review -->
+            <div class="review-form" id="reviewFormSection" style="display:none;margin-top:32px;">
+                <h3 style="font-family:'Playfair Display',serif;font-size:20px;font-weight:500;margin-bottom:4px;">Write a Review</h3>
+                <p style="font-size:12px;color:var(--grey);margin-bottom:20px;">Rate this product and share your thoughts</p>
+                <div class="alert" id="reviewAlert"></div>
+                <div class="form-group">
+                    <label class="form-label">Your Rating</label>
+                    <div style="display:flex;gap:8px;font-size:28px;cursor:pointer;" id="starInput">
+                        <span class="star-pick" onclick="setRating(1)" data-v="1">☆</span>
+                        <span class="star-pick" onclick="setRating(2)" data-v="2">☆</span>
+                        <span class="star-pick" onclick="setRating(3)" data-v="3">☆</span>
+                        <span class="star-pick" onclick="setRating(4)" data-v="4">☆</span>
+                        <span class="star-pick" onclick="setRating(5)" data-v="5">☆</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Comment (Optional)</label>
+                    <textarea class="form-control" id="reviewComment" rows="3"
+                        placeholder="Tell others what you think about this product..."
+                        style="resize:vertical;"></textarea>
+                </div>
+                <button class="btn btn-dark" onclick="submitReview()">Submit Review</button>
+            </div>
+
+            <div id="loginToReview" style="display:none;margin-top:24px;padding:20px;background:var(--cream);border:1px solid var(--border);text-align:center;">
+                <p style="font-size:14px;color:var(--grey);margin-bottom:12px;">Login to leave a review for this product</p>
+                <a href="Login.html" class="btn btn-dark btn-sm">Login</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cart Drawer -->
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+<div class="cart-drawer" id="cartDrawer">
+    <div class="cart-drawer-header">
+        <h3>Shopping Cart</h3>
+        <button class="cart-close" onclick="closeCart()">✕</button>
+    </div>
+    <div class="cart-drawer-body" id="cartDrawerBody"></div>
+    <div class="cart-drawer-footer" id="cartDrawerFooter" style="display:none;">
+        <div class="cart-subtotal"><span>Subtotal</span><span id="cartSubtotal">Rs. 0</span></div>
+        <div class="cart-total-row"><span>Total</span><span id="cartTotalAmt">Rs. 0</span></div>
+        <a href="Checkout.html" class="btn btn-dark btn-full" style="margin-bottom:10px;">Proceed to Checkout</a>
+        <button class="btn btn-outline-dark btn-full" onclick="closeCart()">Continue Shopping</button>
+    </div>
+</div>
+
+<style>
+.star-pick { color: var(--light-grey); cursor: pointer; transition: color 0.15s; }
+.star-pick.filled { color: var(--accent); }
+</style>
+
+<div id="toast"></div>
+
+<script src="js/Main.js?v=3"></script>
+<script>
+    updateNav();
+    updateCartCount();
+    updateCartDrawer();
+
+    const params    = new URLSearchParams(window.location.search);
+    const productId = parseInt(params.get('id'));
+    let   product   = null;
+    let   selectedRating = 0;
+    let   detailQty = 1;
+
+    if (!productId) {
+        window.location.href = 'Products.html';
+    }
+
+    // Load product
+    fetch(`/api/products/${productId}`)
+        .then(r => r.json())
+        .then(p => {
+            product = p;
+            renderProduct(p);
+            loadReviews(productId);
+        })
+        .catch(() => {
+            document.getElementById('detailName').textContent = 'Product not found.';
+        });
+
+    function renderProduct(p) {
+        const pid = Number(p.id || p.productId);
+        const hasDiscount = p.discountedPrice && p.discountedPrice < p.price;
+        const finalPrice  = hasDiscount ? p.discountedPrice : p.price;
+        const isOut       = p.stock === 0;
+        const isLow       = p.stock > 0 && p.stock < 10;
+
+        document.title = `${p.name} — Z A M A R`;
+        document.getElementById('breadcrumbName').textContent = p.name;
+        document.getElementById('detailCategory').textContent = p.category;
+        document.getElementById('detailName').textContent     = p.name;
+        document.getElementById('detailDesc').textContent     = p.description || 'Premium quality clothing.';
+
+        // Image
+        const imgEl = document.getElementById('productImage');
+        if (p.imageUrl && p.imageUrl !== 'null' && p.imageUrl !== '') {
+            imgEl.innerHTML = `<img src="${p.imageUrl}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;">`;
+        } else {
+            imgEl.innerHTML = `<div style="text-align:center;color:var(--light-grey);">
+                <div style="font-size:64px;margin-bottom:12px;">👔</div>
+                <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;">No Image Available</div>
+            </div>`;
+        }
+
+        // Price
+        const priceRow = document.getElementById('priceRow');
+        priceRow.innerHTML = `
+            <span style="font-size:32px;font-weight:700;font-family:'Playfair Display',serif;color:var(--black);">
+                Rs. ${Number(finalPrice).toLocaleString()}
+            </span>
+            ${hasDiscount ? `
+                <span style="font-size:16px;color:var(--light-grey);text-decoration:line-through;">
+                    Rs. ${Number(p.price).toLocaleString()}
+                </span>
+                <span class="badge badge-danger" style="font-size:12px;">
+                    ${Math.round((1 - Number(finalPrice)/Number(p.price))*100)}% OFF
+                </span>` : ''}
+        `;
+
+        // Stock
+        const stockRow = document.getElementById('stockRow');
+        stockRow.innerHTML = `<span style="font-size:13px;font-weight:600;letter-spacing:0.5px;
+            color:${isOut ? 'var(--danger)' : isLow ? '#c45e00' : 'var(--success)'}">
+            ${isOut ? '✕ Out of Stock' : isLow ? `⚠ Only ${p.stock} units left — order soon!` : `✓ In Stock (${p.stock} available)`}
+        </span>`;
+
+        // Cart button
+        const addBtn = document.getElementById('addToCartBtn');
+        if (isOut) {
+            addBtn.disabled = true;
+            addBtn.style.opacity = '0.5';
+            addBtn.style.cursor  = 'not-allowed';
+            addBtn.textContent   = 'Out of Stock';
+        }
+
+        // Wishlist button
+        updateWishlistBtn(pid);
+
+        // Show review form
+        const user = getUser();
+        if (user) {
+            document.getElementById('reviewFormSection').style.display = 'block';
+        } else {
+            document.getElementById('loginToReview').style.display = 'block';
+        }
+    }
+
+    function updateWishlistBtn(pid) {
+        const btn = document.getElementById('wishlistBtn');
+        const inWL = isInWishlist(pid);
+        btn.innerHTML = inWL ? '♥ Remove from Wishlist' : '♡ Add to Wishlist';
+        btn.style.color = inWL ? 'var(--danger)' : '';
+        btn.style.borderColor = inWL ? 'var(--danger)' : '';
+    }
+
+    function changeDetailQty(delta) {
+        const maxStock = product ? product.stock : 99;
+        detailQty = Math.max(1, Math.min(maxStock, detailQty + delta));
+        document.getElementById('detailQty').textContent = detailQty;
+    }
+
+    function addDetailToCart() {
+        if (!product) return;
+        const pid = Number(product.id || product.productId);
+        const hasDiscount = product.discountedPrice && product.discountedPrice < product.price;
+        const finalPrice  = hasDiscount ? product.discountedPrice : product.price;
+        const imgUrl      = product.imageUrl || '';
+        addToCart(pid, product.name, finalPrice, product.category, imgUrl, detailQty);
+    }
+
+    function toggleDetailWishlist() {
+        if (!product) return;
+        const pid = Number(product.id || product.productId);
+        const hasDiscount = product.discountedPrice && product.discountedPrice < product.price;
+        const finalPrice  = hasDiscount ? product.discountedPrice : product.price;
+        toggleWishlist(pid, product.name, finalPrice, product.category, product.imageUrl || '');
+        updateWishlistBtn(pid);
+    }
+
+    // ===== REVIEWS =====
+    function loadReviews(pid) {
+        fetch(`/api/reviews/${pid}/rating`)
+            .then(r => r.json())
+            .then(data => {
+                const avg   = Number(data.average) || 0;
+                const count = Number(data.count)   || 0;
+                document.getElementById('avgRating').textContent = avg > 0 ? avg.toFixed(1) : '—';
+                document.getElementById('avgStars').innerHTML    = buildStars(avg, false);
+                document.getElementById('reviewCountText').textContent =
+                    count > 0 ? `${count} review${count !== 1 ? 's' : ''}` : 'No reviews yet';
+                document.getElementById('ratingStars').innerHTML = buildStars(avg, false);
+                document.getElementById('ratingText').textContent =
+                    count > 0 ? `${avg.toFixed(1)} / 5  (${count} review${count !== 1 ? 's' : ''})` : 'No reviews yet';
+            })
+            .catch(() => {});
+
+        fetch(`/api/reviews/${pid}`)
+            .then(r => r.json())
+            .then(reviews => {
+                const list = document.getElementById('reviewList');
+                if (!reviews.length) {
+                    list.innerHTML = `<div style="padding:32px;text-align:center;color:var(--grey);border:1px solid var(--border);background:var(--white);">
+                        <div style="font-size:32px;margin-bottom:12px;">✍️</div>
+                        <div>Be the first to review this product!</div>
+                    </div>`;
+                    return;
+                }
+                list.innerHTML = reviews.map(r => `
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div>
+                                <div class="reviewer-name">${escHtml(r.userName || 'Customer')}</div>
+                                <div style="margin:4px 0;">${buildStars(r.rating, false)}</div>
+                                <div class="review-date">${r.createdAt ? new Date(r.createdAt).toLocaleDateString('en-PK',{day:'numeric',month:'long',year:'numeric'}) : ''}</div>
+                            </div>
+                        </div>
+                        ${r.comment ? `<div class="review-comment">"${escHtml(r.comment)}"</div>` : ''}
+                    </div>
+                `).join('');
+            })
+            .catch(() => {
+                document.getElementById('reviewList').innerHTML =
+                    '<div style="color:var(--danger);padding:16px;">Could not load reviews.</div>';
+            });
+    }
+
+    function buildStars(rating, interactive) {
+        let html = '';
+        const r = Number(rating);
+        for (let i = 1; i <= 5; i++) {
+            html += `<span style="color:${r >= i ? 'var(--accent)' : r >= i-0.5 ? 'var(--accent-light)' : 'var(--light-grey)'};">
+                ${r >= i ? '★' : r >= i - 0.5 ? '½' : '☆'}</span>`;
+        }
+        return html;
+    }
+
+    function setRating(n) {
+        selectedRating = n;
+        document.querySelectorAll('.star-pick').forEach(s => {
+            const v = parseInt(s.dataset.v);
+            s.textContent  = v <= n ? '★' : '☆';
+            s.classList.toggle('filled', v <= n);
+        });
+    }
+
+    function submitReview() {
+        const user = getUser();
+        if (!user) { showAlert('reviewAlert','Please login to submit a review.','error'); return; }
+        if (selectedRating < 1) { showAlert('reviewAlert','Please select a rating.','error'); return; }
+
+        const comment = document.getElementById('reviewComment').value.trim();
+        fetch('/api/reviews', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productId, userId: user.id, rating: selectedRating, comment })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                showAlert('reviewAlert', '✓ Review submitted! Thank you.', 'success');
+                document.getElementById('reviewComment').value = '';
+                setRating(0);
+                selectedRating = 0;
+                loadReviews(productId);
+            } else {
+                showAlert('reviewAlert', data.message || 'Failed to submit review.', 'error');
+            }
+        })
+        .catch(() => showAlert('reviewAlert', 'Connection error.', 'error'));
+    }
+
+    function escHtml(str) {
+        return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+</script>
+</body>
+</html>

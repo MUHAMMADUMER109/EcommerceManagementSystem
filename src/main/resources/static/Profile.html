@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile — Z A M A R</title>
+    <link rel="stylesheet" href="css/Style.css?v=3">
+</head>
+<body>
+
+<div class="announcement-bar">Free delivery on orders above Rs. 5,000</div>
+
+<nav class="navbar">
+    <div class="nav-left">
+        <a href="Index.html" class="nav-link">Home</a>
+        <a href="Products.html" class="nav-link">Shop All</a>
+    </div>
+    <a href="Index.html" class="logo">Z A M A R<span>Premium Menswear</span></a>
+    <div class="nav-right">
+        <a href="Wishlist.html" class="nav-link" id="navWishlist">♡ <span class="wishlist-count">0</span></a>
+        <a href="Orders.html" class="nav-link" id="navAccount">My Orders</a>
+        <a href="Profile.html" class="nav-link" id="navProfile">Profile</a>
+        <a href="Admin.html" class="nav-link hidden" id="navAdmin">Admin</a>
+        <a href="#" class="nav-link" id="navLogout" onclick="logout()">Logout</a>
+        <button class="nav-icon" onclick="openCart()">🛒<span class="cart-badge cart-count">0</span></button>
+    </div>
+</nav>
+
+<div style="background:var(--cream);min-height:calc(100vh - 72px);">
+<div class="profile-layout">
+
+    <!-- Sidebar -->
+    <aside class="profile-sidebar">
+        <div class="profile-avatar" id="avatarInitial">?</div>
+        <div class="profile-name" id="sidebarName">Loading...</div>
+        <div class="profile-role" id="sidebarRole">Customer</div>
+        <hr style="border:none;border-top:1px solid var(--border);margin:16px 0;">
+        <button class="profile-nav-item active" onclick="showSection('info')">Account Info</button>
+        <button class="profile-nav-item" onclick="showSection('password')">Change Password</button>
+        <button class="profile-nav-item" onclick="window.location.href='Orders.html'">My Orders</button>
+        <button class="profile-nav-item" onclick="window.location.href='Wishlist.html'">Wishlist ♡</button>
+        <hr style="border:none;border-top:1px solid var(--border);margin:16px 0;">
+        <button class="profile-nav-item" style="color:var(--danger);" onclick="logout()">Logout</button>
+    </aside>
+
+    <!-- Main -->
+    <div>
+
+        <!-- Account Info Section -->
+        <div id="sectionInfo">
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    <div class="admin-card-title">Account Information</div>
+                </div>
+                <div class="alert" id="profileAlert"></div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" class="form-control" id="profileName" placeholder="Your name">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" class="form-control" id="profileEmail" placeholder="you@example.com">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Phone Number</label>
+                    <input type="tel" class="form-control" id="profilePhone" placeholder="+92 300 0000000">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Account Role</label>
+                    <input type="text" class="form-control" id="profileRole" readonly
+                        style="background:var(--cream);color:var(--grey);cursor:not-allowed;">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Member Since</label>
+                    <input type="text" class="form-control" id="profileJoined" readonly
+                        style="background:var(--cream);color:var(--grey);cursor:not-allowed;">
+                </div>
+                <button class="btn btn-dark" onclick="saveProfile()">Save Changes</button>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="grid-3" style="margin-top:24px;">
+                <div class="stat-card gold" style="text-align:center;">
+                    <div class="stat-value" id="statTotalOrders">—</div>
+                    <div class="stat-label">Total Orders</div>
+                </div>
+                <div class="stat-card black" style="text-align:center;">
+                    <div class="stat-value" id="statWishlistCount">—</div>
+                    <div class="stat-label">Wishlist Items</div>
+                </div>
+                <div class="stat-card green" style="text-align:center;">
+                    <div class="stat-value" id="statCartCount">—</div>
+                    <div class="stat-label">Cart Items</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Change Password Section -->
+        <div id="sectionPassword" style="display:none;">
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    <div class="admin-card-title">Change Password</div>
+                </div>
+                <div class="alert" id="passwordAlert"></div>
+                <div class="form-group">
+                    <label class="form-label">Current Password</label>
+                    <input type="password" class="form-control" id="currentPass" placeholder="Enter current password">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">New Password</label>
+                    <input type="password" class="form-control" id="newPass" placeholder="Min. 6 characters">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Confirm New Password</label>
+                    <input type="password" class="form-control" id="confirmPass" placeholder="Repeat new password">
+                </div>
+                <button class="btn btn-dark" onclick="changePassword()">Update Password</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+</div>
+
+<!-- Cart Drawer -->
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+<div class="cart-drawer" id="cartDrawer">
+    <div class="cart-drawer-header">
+        <h3>Shopping Cart</h3>
+        <button class="cart-close" onclick="closeCart()">✕</button>
+    </div>
+    <div class="cart-drawer-body" id="cartDrawerBody"></div>
+    <div class="cart-drawer-footer" id="cartDrawerFooter" style="display:none;">
+        <div class="cart-subtotal"><span>Subtotal</span><span id="cartSubtotal">Rs. 0</span></div>
+        <div class="cart-total-row"><span>Total</span><span id="cartTotalAmt">Rs. 0</span></div>
+        <a href="Checkout.html" class="btn btn-dark btn-full" style="margin-bottom:10px;">Checkout</a>
+        <button class="btn btn-outline-dark btn-full" onclick="closeCart()">Continue Shopping</button>
+    </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="js/Main.js?v=3"></script>
+<script>
+    const user = getUser();
+    if (!user) { window.location.href = 'Login.html'; }
+
+    updateNav();
+    updateCartCount();
+    updateCartDrawer();
+    loadProfile();
+
+    function loadProfile() {
+        document.getElementById('avatarInitial').textContent = (user.name || '?').charAt(0).toUpperCase();
+        document.getElementById('sidebarName').textContent   = user.name || 'User';
+        document.getElementById('sidebarRole').textContent   = user.role || 'Customer';
+        document.getElementById('profileName').value         = user.name  || '';
+        document.getElementById('profileEmail').value        = user.email || '';
+        document.getElementById('profilePhone').value        = user.phone || '';
+        document.getElementById('profileRole').value         = user.role  || 'CUSTOMER';
+
+        // Stats
+        document.getElementById('statWishlistCount').textContent = getWishlist().length;
+        document.getElementById('statCartCount').textContent     = getCart().reduce((s,i) => s+i.qty, 0);
+
+        // Load order count
+        fetch(`/api/orders/history/${user.id}`)
+            .then(r => r.json())
+            .then(orders => {
+                document.getElementById('statTotalOrders').textContent = orders.length;
+            })
+            .catch(() => { document.getElementById('statTotalOrders').textContent = '—'; });
+
+        document.getElementById('profileJoined').value = 'Z A M A R Member';
+    }
+
+    function showSection(sec) {
+        document.getElementById('sectionInfo').style.display     = sec === 'info'     ? 'block' : 'none';
+        document.getElementById('sectionPassword').style.display = sec === 'password' ? 'block' : 'none';
+        document.querySelectorAll('.profile-nav-item').forEach(btn => {
+            btn.classList.toggle('active', btn.textContent.toLowerCase().includes(sec === 'info' ? 'account' : 'password'));
+        });
+    }
+
+    function saveProfile() {
+        const name  = document.getElementById('profileName').value.trim();
+        const email = document.getElementById('profileEmail').value.trim();
+        const phone = document.getElementById('profilePhone').value.trim();
+        if (!name || !email) { showAlert('profileAlert', 'Name and email are required.', 'error'); return; }
+
+        fetch(`/api/users/profile/${user.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, phone })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                const updated = { ...user, name: data.name || name, email: data.email || email, phone: data.phone || phone };
+                saveUser(updated);
+                document.getElementById('sidebarName').textContent   = updated.name;
+                document.getElementById('avatarInitial').textContent = updated.name.charAt(0).toUpperCase();
+                showAlert('profileAlert', '✓ Profile updated successfully!', 'success');
+            } else {
+                showAlert('profileAlert', data.message || 'Update failed.', 'error');
+            }
+        })
+        .catch(() => showAlert('profileAlert', 'Connection error.', 'error'));
+    }
+
+    function changePassword() {
+        const current = document.getElementById('currentPass').value;
+        const newPass = document.getElementById('newPass').value;
+        const confirm = document.getElementById('confirmPass').value;
+        if (!current || !newPass || !confirm) { showAlert('passwordAlert','All fields are required.','error'); return; }
+        if (newPass.length < 6) { showAlert('passwordAlert','New password must be at least 6 characters.','error'); return; }
+        if (newPass !== confirm) { showAlert('passwordAlert','New passwords do not match.','error'); return; }
+
+        fetch(`/api/users/password/${user.id}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ currentPassword: current, newPassword: newPass })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                showAlert('passwordAlert','✓ Password changed successfully!','success');
+                document.getElementById('currentPass').value = '';
+                document.getElementById('newPass').value     = '';
+                document.getElementById('confirmPass').value = '';
+            } else {
+                showAlert('passwordAlert', data.message || 'Failed to change password.','error');
+            }
+        })
+        .catch(() => showAlert('passwordAlert','Connection error.','error'));
+    }
+</script>
+</body>
+</html>

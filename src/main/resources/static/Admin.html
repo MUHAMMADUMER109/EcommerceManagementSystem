@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin — Z A M A R</title>
+    <link rel="stylesheet" href="css/Style.css?v=3">
+</head>
+<body>
+
+<div class="admin-layout">
+
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+        <div class="admin-brand">
+            <div class="admin-brand-name">Z A M A R</div>
+            <div class="admin-brand-role">Admin Panel</div>
+        </div>
+        <button class="admin-nav-item active" onclick="showTab('dashboard')">📊 Dashboard</button>
+        <button class="admin-nav-item" onclick="showTab('products')">👔 Products</button>
+        <button class="admin-nav-item" onclick="showTab('orders')">📦 Orders</button>
+        <button class="admin-nav-item" onclick="showTab('discounts')">🏷️ Discounts</button>
+        <button class="admin-nav-item" onclick="showTab('users')">👥 Customers</button>
+        <button class="admin-nav-item" onclick="showTab('reports')">📈 Reports</button>
+        <div style="margin-top:auto;padding-top:40px;">
+            <button class="admin-nav-item" onclick="window.location.href='Index.html'">🏪 View Store</button>
+            <button class="admin-nav-item" onclick="logout()">↩ Logout</button>
+        </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="admin-main">
+
+        <!-- ===== DASHBOARD TAB ===== -->
+        <div id="tabDashboard">
+            <div class="admin-page-title">Dashboard</div>
+            <div class="admin-page-sub" id="dashGreeting">Welcome back, Admin</div>
+            <div class="grid-4" style="margin-bottom:32px;">
+                <div class="stat-card gold">
+                    <span class="stat-icon">👔</span>
+                    <div class="stat-value" id="statProducts">—</div>
+                    <div class="stat-label">Total Products</div>
+                </div>
+                <div class="stat-card black">
+                    <span class="stat-icon">📦</span>
+                    <div class="stat-value" id="statOrders">—</div>
+                    <div class="stat-label">Total Orders</div>
+                </div>
+                <div class="stat-card red">
+                    <span class="stat-icon">⚠</span>
+                    <div class="stat-value" id="statLowStock">—</div>
+                    <div class="stat-label">Low Stock</div>
+                </div>
+                <div class="stat-card green">
+                    <span class="stat-icon">💰</span>
+                    <div class="stat-value" id="statRevenue">—</div>
+                    <div class="stat-label">Revenue (Rs.)</div>
+                </div>
+            </div>
+
+            <!-- Low Stock Alert -->
+            <div id="lowStockAlert" style="display:none;" class="admin-card" style="border-left:3px solid var(--danger);">
+                <div class="admin-card-header">
+                    <div class="admin-card-title" style="color:var(--danger);">⚠ Low Stock Alert</div>
+                    <button class="btn btn-outline-dark btn-sm" onclick="showTab('products')">Manage Products</button>
+                </div>
+                <div id="lowStockList" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+            </div>
+
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    <div class="admin-card-title">Recent Orders</div>
+                    <button class="btn btn-outline-dark btn-sm" onclick="showTab('orders')">View All</button>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Order ID</th><th>Customer</th><th>Product</th><th>Total</th><th>Status</th><th>Date</th></tr></thead>
+                        <tbody id="recentOrders">
+                            <tr><td colspan="6" style="text-align:center;color:var(--grey);padding:24px;">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== PRODUCTS TAB ===== -->
+        <div id="tabProducts" style="display:none;">
+            <div class="admin-page-title">Products</div>
+            <div class="admin-page-sub">Manage your clothing inventory</div>
+            <div class="alert" id="prodAlert"></div>
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    <div class="admin-card-title">All Products</div>
+                    <div style="display:flex;gap:8px;">
+                        <input type="text" id="prodSearch" class="form-control" placeholder="Search products…"
+                            style="width:200px;padding:8px 12px;font-size:13px;"
+                            oninput="filterProductTable(this.value)">
+                        <button class="btn btn-dark btn-sm" onclick="openModal('addProductModal')">+ Add Product</button>
+                    </div>
+                </div>
+                <div class="table-wrap">
+                    <table class="tbl-products">
+                        <thead>
+                        <tr><th>ID</th><th>Image</th><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Discount</th><th>Actions</th></tr>
+                        </thead>
+                        <tbody id="productTableBody">
+                            <tr><td colspan="8" style="text-align:center;color:var(--grey);padding:24px;">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== ORDERS TAB ===== -->
+        <div id="tabOrders" style="display:none;">
+            <div class="admin-page-title">All Orders</div>
+            <div class="admin-page-sub">Manage and track customer orders</div>
+            <div class="alert" id="orderAlert"></div>
+
+            <!-- Filter Row -->
+            <div style="display:flex;gap:12px;align-items:center;margin-bottom:20px;flex-wrap:wrap;">
+                <select class="status-select" id="orderStatusFilter" onchange="filterOrders()" style="padding:10px 14px;font-size:13px;">
+                    <option value="">All Statuses</option>
+                    <option>Confirmed</option>
+                    <option>Processing</option>
+                    <option>Shipped</option>
+                    <option>Delivered</option>
+                    <option>Cancelled</option>
+                </select>
+                <input type="text" id="orderSearch" class="form-control"
+                    placeholder="Search customer or product…"
+                    style="max-width:280px;padding:10px 14px;font-size:13px;"
+                    oninput="filterOrders()">
+                <span id="orderCountBadge" style="font-size:12px;color:var(--grey);"></span>
+            </div>
+
+            <div class="admin-card" style="padding:0;">
+                <div class="table-wrap">
+                    <table class="tbl-admin-orders">
+                        <thead>
+                        <tr><th>Order ID</th><th>Customer</th><th>Product</th><th>Qty</th><th>Total</th><th>Date</th><th>Status</th><th>Actions</th></tr>
+                        </thead>
+                        <tbody id="allOrdersBody">
+                            <tr><td colspan="8" style="text-align:center;color:var(--grey);padding:24px;">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== DISCOUNTS TAB ===== -->
+        <div id="tabDiscounts" style="display:none;">
+            <div class="admin-page-title">Discounts</div>
+            <div class="admin-page-sub">Apply and manage product discounts</div>
+            <div class="alert" id="discountAlert"></div>
+            <div class="grid-2">
+                <div class="admin-card">
+                    <div class="admin-card-header">
+                        <div class="admin-card-title">Apply Discount</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Select Product</label>
+                        <select class="form-control" id="discountProductId">
+                            <option value="">— Select Product —</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Discount Percentage (%)</label>
+                        <input type="number" class="form-control" id="discountPercent"
+                            placeholder="e.g. 10 for 10% off" min="1" max="90">
+                    </div>
+                    <div id="discountPreview" style="display:none;padding:16px;background:var(--cream);border:1px solid var(--border);margin-bottom:20px;">
+                        <div style="font-size:12px;color:var(--grey);margin-bottom:4px;">Preview</div>
+                        <div style="display:flex;gap:16px;align-items:center;">
+                            <span style="text-decoration:line-through;color:var(--grey);" id="previewOriginal"></span>
+                            <span style="font-size:20px;font-weight:600;color:var(--success);" id="previewDiscounted"></span>
+                            <span class="badge badge-danger" id="previewBadge"></span>
+                        </div>
+                    </div>
+                    <button class="btn btn-gold btn-full" onclick="applyDiscount()">Apply Discount</button>
+                </div>
+
+                <div class="admin-card">
+                    <div class="admin-card-header">
+                        <div class="admin-card-title">Active Discounts</div>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                            <tr><th>Product</th><th>Original</th><th>Sale Price</th><th>%</th><th>Action</th></tr>
+                            </thead>
+                            <tbody id="discountedBody">
+                                <tr><td colspan="5" style="text-align:center;color:var(--grey);padding:24px;">No discounts applied.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== CUSTOMERS TAB ===== -->
+        <div id="tabUsers" style="display:none;">
+            <div class="admin-page-title">Customers</div>
+            <div class="admin-page-sub">View and manage registered customers</div>
+            <div class="alert" id="userAlert"></div>
+
+            <div class="grid-3" style="margin-bottom:24px;">
+                <div class="report-stat">
+                    <div class="report-stat-val" id="statTotalUsers">—</div>
+                    <div class="report-stat-label">Total Users</div>
+                </div>
+                <div class="report-stat">
+                    <div class="report-stat-val" id="statCustomers">—</div>
+                    <div class="report-stat-label">Customers</div>
+                </div>
+                <div class="report-stat">
+                    <div class="report-stat-val" id="statAdmins">—</div>
+                    <div class="report-stat-label">Admins</div>
+                </div>
+            </div>
+
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    <div class="admin-card-title">All Users</div>
+                    <input type="text" id="userSearch" class="form-control"
+                        placeholder="Search by name or email…"
+                        style="width:240px;padding:8px 12px;font-size:13px;"
+                        oninput="filterUsers(this.value)">
+                </div>
+                <div class="table-wrap">
+                    <table class="tbl-users">
+                        <thead>
+                        <tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Action</th></tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <tr><td colspan="5" style="text-align:center;color:var(--grey);padding:24px;">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== REPORTS TAB ===== -->
+        <div id="tabReports" style="display:none;">
+            <div class="admin-page-title">Reports & Analytics</div>
+            <div class="admin-page-sub">Sales insights and performance overview</div>
+
+            <div class="grid-4" style="margin-bottom:32px;">
+                <div class="report-stat">
+                    <div class="report-stat-val" id="rTotalRevenue">—</div>
+                    <div class="report-stat-label">Total Revenue (Rs.)</div>
+                </div>
+                <div class="report-stat">
+                    <div class="report-stat-val" id="rTotalOrders">—</div>
+                    <div class="report-stat-label">Total Orders</div>
+                </div>
+                <div class="report-stat">
+                    <div class="report-stat-val" id="rAvgOrder">—</div>
+                    <div class="report-stat-label">Avg. Order (Rs.)</div>
+                </div>
+                <div class="report-stat">
+                    <div class="report-stat-val" id="rTotalCustomers">—</div>
+                    <div class="report-stat-label">Total Customers</div>
+                </div>
+            </div>
+
+            <div class="grid-2" style="margin-bottom:24px;">
+                <div class="admin-card">
+                    <div class="admin-card-header">
+                        <div class="admin-card-title">Revenue by Category</div>
+                    </div>
+                    <div class="bar-chart-wrap" id="categoryChart">
+                        <div style="text-align:center;padding:20px;color:var(--grey);">Loading...</div>
+                    </div>
+                </div>
+                <div class="admin-card">
+                    <div class="admin-card-header">
+                        <div class="admin-card-title">Order Status Breakdown</div>
+                    </div>
+                    <div class="bar-chart-wrap" id="statusChart">
+                        <div style="text-align:center;padding:20px;color:var(--grey);">Loading...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    <div class="admin-card-title">Top Selling Products</div>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Product</th><th>Category</th><th>Units Sold</th><th>Revenue</th><th>Popularity</th></tr></thead>
+                        <tbody id="topProductsBody">
+                            <tr><td colspan="5" style="text-align:center;color:var(--grey);padding:24px;">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<!-- ===== ADD PRODUCT MODAL ===== -->
+<div class="modal-overlay" id="addProductModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Add New Product</h3>
+            <button class="modal-close" onclick="closeModal('addProductModal')">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="alert" id="addProdAlert"></div>
+            <div class="form-group">
+                <label class="form-label">Product Name</label>
+                <input type="text" class="form-control" id="addName" placeholder="Classic White Shirt">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    <select class="form-control" id="addCategory">
+                        <option>Shirts</option>
+                        <option>Trousers</option>
+                        <option>Suits</option>
+                        <option>Jackets</option>
+                        <option>Accessories</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Price (Rs.)</label>
+                    <input type="number" class="form-control" id="addPrice" placeholder="2500" min="1">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Stock Quantity</label>
+                    <input type="number" class="form-control" id="addStock" placeholder="50" min="0">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Description</label>
+                <input type="text" class="form-control" id="addDesc" placeholder="Short product description">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Product Image</label>
+                <div id="imageDropZone"
+                     style="border:2px dashed var(--border);border-radius:4px;padding:32px 20px;text-align:center;cursor:pointer;transition:all 0.3s;background:var(--cream);"
+                     onclick="document.getElementById('imageFile').click()"
+                     ondragover="event.preventDefault();this.style.borderColor='var(--black)'"
+                     ondragleave="this.style.borderColor='var(--border)'"
+                     ondrop="handleDrop(event)">
+                    <div id="imagePreviewWrap" style="display:none;margin-bottom:12px;">
+                        <img id="imagePreview" style="max-height:120px;max-width:100%;object-fit:contain;border-radius:4px;">
+                    </div>
+                    <div id="imageDropText">
+                        <div style="font-size:28px;margin-bottom:8px;">📷</div>
+                        <div style="font-size:13px;font-weight:600;color:var(--mid);">Click to upload or drag & drop</div>
+                        <div style="font-size:11px;color:var(--grey);margin-top:4px;">JPG, PNG, WEBP — Max 5MB</div>
+                    </div>
+                </div>
+                <input type="file" id="imageFile" accept="image/*" style="display:none" onchange="previewImage(this)">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-dark" onclick="addProduct()">Add Product</button>
+            <button class="btn btn-outline-dark" onclick="closeModal('addProductModal')">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== EDIT PRODUCT MODAL ===== -->
+<div class="modal-overlay" id="editProductModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Edit Product</h3>
+            <button class="modal-close" onclick="closeModal('editProductModal')">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="alert" id="editProdAlert"></div>
+            <input type="hidden" id="editId">
+            <div class="form-group">
+                <label class="form-label">Product Name</label>
+                <input type="text" class="form-control" id="editName" placeholder="Product name">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    <select class="form-control" id="editCategory">
+                        <option>Shirts</option>
+                        <option>Trousers</option>
+                        <option>Suits</option>
+                        <option>Jackets</option>
+                        <option>Accessories</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Price (Rs.)</label>
+                    <input type="number" class="form-control" id="editPrice" min="1">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Stock</label>
+                    <input type="number" class="form-control" id="editStock" min="0">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Description</label>
+                <input type="text" class="form-control" id="editDesc" placeholder="Short product description">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-gold" onclick="updateProduct()">Save Changes</button>
+            <button class="btn btn-outline-dark" onclick="closeModal('editProductModal')">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== DELETE ORDER MODAL ===== -->
+<div class="modal-overlay" id="deleteOrderModal">
+    <div class="modal" style="max-width:400px;">
+        <div class="modal-header">
+            <h3>Delete Order</h3>
+            <button class="modal-close" onclick="closeModal('deleteOrderModal')">✕</button>
+        </div>
+        <div class="modal-body">
+            <p style="font-size:14px;color:var(--grey);line-height:1.7;">Are you sure you want to delete order <strong id="deleteOrderId"></strong>? Stock will be restored.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-danger" onclick="confirmDeleteOrder()">Delete Order</button>
+            <button class="btn btn-outline-dark" onclick="closeModal('deleteOrderModal')">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== DELETE USER MODAL ===== -->
+<div class="modal-overlay" id="deleteUserModal">
+    <div class="modal" style="max-width:400px;">
+        <div class="modal-header">
+            <h3>Delete Customer</h3>
+            <button class="modal-close" onclick="closeModal('deleteUserModal')">✕</button>
+        </div>
+        <div class="modal-body">
+            <p style="font-size:14px;color:var(--grey);line-height:1.7;">Are you sure you want to delete customer <strong id="deleteUserName"></strong>? All their orders will also be removed. This cannot be undone.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-danger" onclick="confirmDeleteUser()">Delete Customer</button>
+            <button class="btn btn-outline-dark" onclick="closeModal('deleteUserModal')">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="js/Main.js?v=3"></script>
+<script>
+    const adminUser = getUser();
+    if (!adminUser || adminUser.role !== 'ADMIN') window.location.href = 'Login.html';
+
+    document.getElementById('dashGreeting').textContent = `Welcome back, ${adminUser.name || 'Admin'}`;
+
+    let allProducts   = [];
+    let allOrders     = [];
+    let allUsers      = [];
+    let orderToDelete = null;
+    let userToDelete  = null;
+
+    loadDashboard();
+    loadProducts();
+    loadAllOrders();
+    loadAllUsers();
+    initAdminMobileNav();
+
+    let _currentTab = 'dashboard';
+
+    // ===== TAB NAV =====
+    function showTab(tab) {
+        _currentTab = tab;
+        ['dashboard','products','orders','discounts','users','reports'].forEach(t => {
+            const el = document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1));
+            if (el) el.style.display = 'none';
+        });
+        const active = document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1));
+        if (active) active.style.display = 'block';
+        // Desktop sidebar active state
+        document.querySelectorAll('.admin-nav-item').forEach(btn => {
+            const label = btn.textContent.toLowerCase().replace(/[^a-z]/g,'');
+            const tabClean = tab.toLowerCase();
+            btn.classList.toggle('active',
+                label.includes(tabClean) ||
+                (tabClean === 'users' && label.includes('customer')) ||
+                (tabClean === 'reports' && label.includes('report'))
+            );
+        });
+        // Mobile menu active state
+        document.querySelectorAll('.admin-mob-item[data-tab]').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.tab === tab);
+        });
+        // Update mobile header subtitle
+        const labels = {
+            dashboard:'Dashboard', products:'Products', orders:'Orders',
+            discounts:'Discounts', users:'Customers', reports:'Reports'
+        };
+        const sub = document.getElementById('adminMobSub');
+        if (sub) sub.textContent = labels[tab] || 'Admin Panel';
+        if (tab === 'reports') buildReports();
+    }
+
+    // ===== ADMIN MOBILE NAV =====
+    // Always inject — CSS hides it on desktop, shows on mobile
+    function initAdminMobileNav() {
+        if (document.getElementById('adminMobHeader')) return;
+
+        // ── Sticky header ──
+        const header = document.createElement('div');
+        header.id = 'adminMobHeader';
+        header.className = 'admin-mob-header';
+        header.innerHTML = `
+            <button class="admin-mob-ham" id="adminMobHam" aria-label="Open admin menu">
+                <span></span><span></span><span></span>
+            </button>
+            <div class="admin-mob-title">
+                Z A M A R
+                <small id="adminMobSub">Dashboard</small>
+            </div>
+            <div style="min-width:36px;"></div>
+        `;
+        const layout = document.querySelector('.admin-layout');
+        if (layout) layout.parentNode.insertBefore(header, layout);
+
+        // ── Full-screen menu ──
+        const menu = document.createElement('div');
+        menu.id = 'adminMobMenu';
+        menu.className = 'admin-mob-menu';
+        menu.innerHTML = `
+            <div class="admin-mob-menu-head">
+                <button class="admin-mob-close" id="adminMobClose">✕</button>
+                <div class="admin-mob-title">
+                    Z A M A R
+                    <small>Admin Panel</small>
+                </div>
+                <div style="min-width:36px;"></div>
+            </div>
+
+            <div class="admin-mob-section-label">Manage</div>
+            <button class="admin-mob-item active" data-tab="dashboard">📊 &nbsp; Dashboard</button>
+            <button class="admin-mob-item" data-tab="products">👔 &nbsp; Products</button>
+            <button class="admin-mob-item" data-tab="orders">📦 &nbsp; Orders</button>
+            <button class="admin-mob-item" data-tab="discounts">🏷️ &nbsp; Discounts</button>
+            <button class="admin-mob-item" data-tab="users">👥 &nbsp; Customers</button>
+            <button class="admin-mob-item" data-tab="reports">📈 &nbsp; Reports</button>
+
+            <div class="admin-mob-divider"></div>
+            <div class="admin-mob-section-label">Store</div>
+            <button class="admin-mob-item" onclick="window.location.href='Index.html'">🏪 &nbsp; View Store</button>
+            <button class="admin-mob-item danger" onclick="logout()">↩ &nbsp; Logout</button>
+        `;
+        document.body.appendChild(menu);
+
+        // Open
+        document.getElementById('adminMobHam').addEventListener('click', () => {
+            menu.classList.add('open');
+            document.body.style.overflow = 'hidden';
+            // Sync active state to current tab
+            menu.querySelectorAll('.admin-mob-item[data-tab]').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tab === _currentTab);
+            });
+        });
+
+        // Close
+        document.getElementById('adminMobClose').addEventListener('click', () => {
+            menu.classList.remove('open');
+            document.body.style.overflow = '';
+        });
+
+        // Tab selection
+        menu.querySelectorAll('[data-tab]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                showTab(btn.dataset.tab);
+                menu.classList.remove('open');
+                document.body.style.overflow = '';
+            });
+        });
+    }
+
+    // If user resizes back to desktop while menu is open, unlock the body
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 900) {
+            const m = document.getElementById('adminMobMenu');
+            if (m) m.classList.remove('open');
+            document.body.style.overflow = '';
+        }
+    });
+
+    // ===== DASHBOARD =====
+    function loadDashboard() {
+        fetch('/api/products').then(r => r.json()).then(products => {
+            document.getElementById('statProducts').textContent = products.length;
+            const lowStock = products.filter(p => p.stock > 0 && p.stock < 10);
+            document.getElementById('statLowStock').textContent = lowStock.length;
+            if (lowStock.length > 0) {
+                document.getElementById('lowStockAlert').style.display = 'block';
+                document.getElementById('lowStockList').innerHTML = lowStock.map(p =>
+                    `<span class="badge badge-danger" style="font-size:11px;">${p.name} (${p.stock} left)</span>`
+                ).join('');
+            }
+        }).catch(() => {});
+
+        fetch('/api/orders/all').then(r => r.json()).then(orders => {
+            document.getElementById('statOrders').textContent = orders.length;
+            const revenue = orders.reduce((s, o) => s + Number(o.totalAmount), 0);
+            document.getElementById('statRevenue').textContent = (revenue / 1000).toFixed(0) + 'K';
+            const tbody = document.getElementById('recentOrders');
+            if (!orders.length) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--grey);padding:24px;">No orders yet.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = orders.slice(0, 5).map(o => `
+                <tr>
+                    <td><strong>#${o.orderId}</strong></td>
+                    <td>${o.customerName || '—'}</td>
+                    <td>${o.productName}</td>
+                    <td style="font-weight:600;">Rs. ${Number(o.totalAmount).toLocaleString()}</td>
+                    <td>${statusBadge(o.status || 'Confirmed')}</td>
+                    <td>${new Date(o.orderDate).toLocaleDateString('en-PK',{day:'numeric',month:'short'})}</td>
+                </tr>
+            `).join('');
+        }).catch(() => {});
+    }
+
+    // ===== PRODUCTS =====
+    function loadProducts() {
+        fetch('/api/products').then(r => r.json()).then(products => {
+            allProducts = products;
+            renderProductTable(products);
+            loadDiscountSelect(products);
+        }).catch(() => {});
+    }
+
+    function filterProductTable(q) {
+        const filtered = q
+            ? allProducts.filter(p => p.name.toLowerCase().includes(q.toLowerCase()) || p.category.toLowerCase().includes(q.toLowerCase()))
+            : allProducts;
+        renderProductTable(filtered);
+    }
+
+    function renderProductTable(products) {
+        const tbody = document.getElementById('productTableBody');
+        if (!products.length) {
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--grey);padding:24px;">No products found.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = products.map(p => {
+            const pid = Number(p.id || p.productId);
+            const hasDiscount = p.discountedPrice && p.discountedPrice < p.price;
+            const isLow = p.stock > 0 && p.stock < 10;
+            const isOut = p.stock === 0;
+            const imgHtml = p.imageUrl
+                ? `<img src="${p.imageUrl}" style="width:40px;height:48px;object-fit:cover;border-radius:3px;border:1px solid var(--border);">`
+                : `<div style="width:40px;height:48px;background:var(--cream);border:1px solid var(--border);border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:18px;">👔</div>`;
+            return `<tr>
+                <td>#${pid}</td>
+                <td>${imgHtml}</td>
+                <td style="font-weight:500;color:var(--black);">${p.name}</td>
+                <td><span class="badge badge-dark">${p.category}</span></td>
+                <td>Rs. ${Number(p.price).toLocaleString()}</td>
+                <td><span style="font-weight:600;color:${isOut ? 'var(--danger)' : isLow ? '#c45e00' : 'var(--success)'};">${p.stock}</span></td>
+                <td>${hasDiscount
+                    ? `<span class="badge badge-success">Rs. ${Number(p.discountedPrice).toLocaleString()}</span>`
+                    : '<span style="color:var(--light-grey);font-size:12px;">—</span>'}</td>
+                <td style="display:flex;gap:6px;">
+                    <button class="btn btn-outline-dark btn-sm" onclick="openEdit(${pid})">Edit</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteProduct(${pid})">Delete</button>
+                </td>
+            </tr>`;
+        }).join('');
+    }
+
+    function previewImage(input) {
+        const file = input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = e => {
+            document.getElementById('imagePreview').src = e.target.result;
+            document.getElementById('imagePreviewWrap').style.display = 'block';
+            document.getElementById('imageDropText').style.display    = 'none';
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function handleDrop(event) {
+        event.preventDefault();
+        document.getElementById('imageDropZone').style.borderColor = 'var(--border)';
+        const file = event.dataTransfer.files[0];
+        if (file && file.type.startsWith('image/')) {
+            const input = document.getElementById('imageFile');
+            const dt = new DataTransfer();
+            dt.items.add(file);
+            input.files = dt.files;
+            previewImage(input);
+        }
+    }
+
+    function addProduct() {
+        const name      = document.getElementById('addName').value.trim();
+        const category  = document.getElementById('addCategory').value;
+        const priceVal  = document.getElementById('addPrice').value;
+        const stockVal  = document.getElementById('addStock').value;
+        const desc      = document.getElementById('addDesc').value.trim();
+        const imageFile = document.getElementById('imageFile').files[0];
+        const price = parseFloat(priceVal);
+        const stock = parseInt(stockVal);
+
+        if (!name)                    { showAlert('addProdAlert','Please enter product name.','error'); return; }
+        if (isNaN(price) || price<=0) { showAlert('addProdAlert','Please enter valid price.','error'); return; }
+        if (isNaN(stock) || stock<0)  { showAlert('addProdAlert','Please enter valid stock.','error'); return; }
+
+        const btn = document.querySelector('#addProductModal .btn-dark');
+        if (btn) { btn.textContent = 'Adding…'; btn.disabled = true; }
+
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('category', category);
+        formData.append('price', price.toString());
+        formData.append('stock', stock.toString());
+        formData.append('description', desc);
+        if (imageFile) formData.append('image', imageFile);
+
+        fetch('/api/products/add', { method: 'POST', body: formData })
+        .then(r => r.json())
+        .then(data => {
+            if (btn) { btn.textContent = 'Add Product'; btn.disabled = false; }
+            if (data.success) {
+                closeModal('addProductModal');
+                showToast('✓ Product added successfully');
+                ['addName','addPrice','addStock','addDesc'].forEach(id => document.getElementById(id).value = '');
+                document.getElementById('imageFile').value = '';
+                document.getElementById('imagePreviewWrap').style.display = 'none';
+                document.getElementById('imageDropText').style.display    = 'block';
+                loadProducts(); loadDashboard();
+            } else {
+                showAlert('addProdAlert', data.message || 'Failed.', 'error');
+            }
+        })
+        .catch(() => {
+            if (btn) { btn.textContent = 'Add Product'; btn.disabled = false; }
+            showAlert('addProdAlert','Unable to connect.','error');
+        });
+    }
+
+    function openEdit(id) {
+        const p = allProducts.find(x => Number(x.id || x.productId) === Number(id));
+        if (!p) return;
+        document.getElementById('editId').value       = id;
+        document.getElementById('editName').value     = p.name;
+        document.getElementById('editCategory').value = p.category;
+        document.getElementById('editPrice').value    = p.price;
+        document.getElementById('editStock').value    = p.stock;
+        document.getElementById('editDesc').value     = p.description || '';
+        openModal('editProductModal');
+    }
+
+    function updateProduct() {
+        const id          = document.getElementById('editId').value;
+        const name        = document.getElementById('editName').value.trim();
+        const category    = document.getElementById('editCategory').value;
+        const price       = parseFloat(document.getElementById('editPrice').value);
+        const stock       = parseInt(document.getElementById('editStock').value);
+        const description = document.getElementById('editDesc').value.trim();
+
+        if (!name)                    { showAlert('editProdAlert', 'Product name is required.', 'error'); return; }
+        if (isNaN(price) || price<=0) { showAlert('editProdAlert', 'Enter a valid price.', 'error'); return; }
+        if (isNaN(stock) || stock<0)  { showAlert('editProdAlert', 'Enter a valid stock quantity.', 'error'); return; }
+
+        fetch(`/api/products/update/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, category, price, stock, description })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                closeModal('editProductModal');
+                showToast('✓ Product updated');
+                loadProducts();
+                loadDashboard();
+            } else {
+                showAlert('editProdAlert', data.message || 'Update failed.', 'error');
+            }
+        })
+        .catch(() => showAlert('editProdAlert', 'Connection error.', 'error'));
+    }
+
+    function deleteProduct(id) {
+        if (!confirm('Delete this product? This cannot be undone.')) return;
+        fetch(`/api/products/delete/${id}`, { method: 'DELETE' })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) { showToast('✓ Product deleted'); loadProducts(); loadDashboard(); }
+            else showAlert('prodAlert', data.message || 'Failed.', 'error');
+        })
+        .catch(() => showToast('Connection error'));
+    }
+
+    // ===== ORDERS =====
+    function loadAllOrders() {
+        fetch('/api/orders/all').then(r => r.json()).then(orders => {
+            allOrders = orders;
+            renderOrdersTable(orders);
+        }).catch(() => {});
+    }
+
+    function filterOrders() {
+        const statusFilter = document.getElementById('orderStatusFilter').value;
+        const q = document.getElementById('orderSearch').value.trim().toLowerCase();
+        const filtered = allOrders.filter(o => {
+            const matchStatus = !statusFilter || (o.status || 'Confirmed') === statusFilter;
+            const matchSearch = !q || (o.customerName || '').toLowerCase().includes(q) || (o.productName || '').toLowerCase().includes(q);
+            return matchStatus && matchSearch;
+        });
+        renderOrdersTable(filtered);
+    }
+
+    function renderOrdersTable(orders) {
+        const tbody = document.getElementById('allOrdersBody');
+        document.getElementById('orderCountBadge').textContent = `${orders.length} order${orders.length !== 1 ? 's' : ''}`;
+        if (!orders.length) {
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--grey);padding:24px;">No orders found.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = orders.map(o => {
+            const status = o.status || 'Confirmed';
+            return `
+            <tr>
+                <td><strong>#${o.orderId}</strong></td>
+                <td>
+                    <div style="font-weight:500;">${o.customerName || '—'}</div>
+                    <div class="cust-email" style="font-size:11px;color:var(--grey);">${o.customerEmail || ''}</div>
+                </td>
+                <td>${o.productName}</td>
+                <td>${o.quantity}</td>
+                <td style="font-weight:600;">Rs. ${Number(o.totalAmount).toLocaleString()}</td>
+                <td style="white-space:nowrap;font-size:12px;">${new Date(o.orderDate).toLocaleDateString('en-PK',{day:'numeric',month:'short',year:'numeric'})}</td>
+                <td>
+                    <select class="status-select" onchange="updateOrderStatus(${o.orderId}, this.value)" title="Change status">
+                        ${['Confirmed','Processing','Shipped','Delivered','Cancelled'].map(s =>
+                            `<option value="${s}" ${status === s ? 'selected' : ''}>${s}</option>`
+                        ).join('')}
+                    </select>
+                </td>
+                <td>
+                    <button class="btn btn-danger btn-sm" onclick="openDeleteOrder(${o.orderId})">Delete</button>
+                </td>
+            </tr>`;
+        }).join('');
+    }
+
+    function updateOrderStatus(orderId, status) {
+        fetch(`/api/orders/status/${orderId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                showToast(`✓ Order #${orderId} → ${status}`);
+                const order = allOrders.find(o => o.orderId === orderId);
+                if (order) order.status = status;
+                loadDashboard();
+            } else {
+                showToast('Failed to update status');
+                loadAllOrders();
+            }
+        })
+        .catch(() => { showToast('Connection error'); loadAllOrders(); });
+    }
+
+    function openDeleteOrder(id) {
+        orderToDelete = id;
+        document.getElementById('deleteOrderId').textContent = '#' + id;
+        openModal('deleteOrderModal');
+    }
+
+    function confirmDeleteOrder() {
+        if (!orderToDelete) return;
+        fetch(`/api/orders/delete/${orderToDelete}`, { method: 'DELETE' })
+        .then(r => r.json())
+        .then(data => {
+            closeModal('deleteOrderModal');
+            if (data.success) { showToast('✓ Order deleted'); loadAllOrders(); loadDashboard(); }
+            else showAlert('orderAlert', data.message || 'Failed.', 'error');
+        })
+        .catch(() => { closeModal('deleteOrderModal'); showToast('Connection error'); });
+    }
+
+    // ===== DISCOUNTS =====
+    function loadDiscountSelect(products) {
+        const sel = document.getElementById('discountProductId');
+        sel.innerHTML = '<option value="">— Select Product —</option>' +
+            products.map(p => `<option value="${Number(p.id||p.productId)}" data-price="${p.price}">${p.name} — Rs. ${Number(p.price).toLocaleString()}</option>`).join('');
+
+        const discounted = products.filter(p => p.discountedPrice && p.discountedPrice < p.price);
+        const tbody = document.getElementById('discountedBody');
+        if (!discounted.length) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--grey);padding:24px;">No discounts applied yet.</td></tr>';
+        } else {
+            tbody.innerHTML = discounted.map(p => {
+                const pid = Number(p.id||p.productId);
+                const pct = Math.round((1 - p.discountedPrice/p.price)*100);
+                return `<tr>
+                    <td style="font-weight:500;">${p.name}</td>
+                    <td style="text-decoration:line-through;color:var(--grey);">Rs. ${Number(p.price).toLocaleString()}</td>
+                    <td style="font-weight:600;color:var(--success);">Rs. ${Number(p.discountedPrice).toLocaleString()}</td>
+                    <td><span class="badge badge-danger">${pct}% OFF</span></td>
+                    <td><button class="btn btn-outline-dark btn-sm" onclick="removeDiscount(${pid})">Remove</button></td>
+                </tr>`;
+            }).join('');
+        }
+    }
+
+    document.addEventListener('input', () => {
+        const sel  = document.getElementById('discountProductId');
+        const pct  = parseFloat(document.getElementById('discountPercent').value);
+        const opt  = sel && sel.options[sel.selectedIndex];
+        const preview = document.getElementById('discountPreview');
+        if (sel && sel.value && pct > 0 && pct < 100 && opt && opt.dataset.price) {
+            const orig = parseFloat(opt.dataset.price);
+            const disc = Math.round(orig * (1 - pct/100));
+            document.getElementById('previewOriginal').textContent   = 'Rs. ' + orig.toLocaleString();
+            document.getElementById('previewDiscounted').textContent = 'Rs. ' + disc.toLocaleString();
+            document.getElementById('previewBadge').textContent      = pct + '% OFF';
+            preview.style.display = 'block';
+        } else if (preview) {
+            preview.style.display = 'none';
+        }
+    });
+
+    function applyDiscount() {
+        const productId = document.getElementById('discountProductId').value;
+        const percent   = parseFloat(document.getElementById('discountPercent').value);
+        if (!productId) { showAlert('discountAlert','Please select a product.','error'); return; }
+        if (!percent || percent < 1 || percent > 90) { showAlert('discountAlert','Enter a valid discount (1–90%).','error'); return; }
+        fetch(`/api/products/discount/${productId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ discountPercent: percent })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                showAlert('discountAlert',`✓ Discount applied! New price: Rs. ${Number(data.discountedPrice).toLocaleString()}`,'success');
+                loadProducts();
+            } else {
+                showAlert('discountAlert', data.message || 'Failed.','error');
+            }
+        })
+        .catch(() => showAlert('discountAlert','Unable to connect.','error'));
+    }
+
+    function removeDiscount(productId) {
+        fetch(`/api/products/discount/${productId}`, { method: 'DELETE' })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) { showToast('✓ Discount removed'); loadProducts(); }
+            else showToast('Failed to remove discount');
+        })
+        .catch(() => showToast('Connection error'));
+    }
+
+    // ===== USERS =====
+    function loadAllUsers() {
+        fetch('/api/users/all').then(r => r.json()).then(users => {
+            allUsers = users;
+            renderUsersTable(users);
+            document.getElementById('statTotalUsers').textContent = users.length;
+            document.getElementById('statCustomers').textContent  = users.filter(u => u.role === 'CUSTOMER').length;
+            document.getElementById('statAdmins').textContent     = users.filter(u => u.role === 'ADMIN').length;
+        }).catch(() => {});
+    }
+
+    function filterUsers(q) {
+        const filtered = q
+            ? allUsers.filter(u => (u.name||'').toLowerCase().includes(q.toLowerCase()) || (u.email||'').toLowerCase().includes(q.toLowerCase()))
+            : allUsers;
+        renderUsersTable(filtered);
+    }
+
+    function renderUsersTable(users) {
+        const tbody = document.getElementById('usersTableBody');
+        if (!users.length) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--grey);padding:24px;">No users found.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = users.map(u => `
+            <tr>
+                <td>#${u.userId}</td>
+                <td style="font-weight:500;color:var(--black);">${u.name}</td>
+                <td style="color:var(--grey);">${u.email}</td>
+                <td style="color:var(--grey);">${u.phone || '<span style="color:var(--light-grey);font-size:11px;">—</span>'}</td>
+                <td>
+                    <span class="badge ${u.role === 'ADMIN' ? 'badge-gold' : 'badge-dark'}">${u.role}</span>
+                </td>
+                <td>
+                    ${u.role !== 'ADMIN' || u.userId !== adminUser.id
+                        ? `<button class="btn btn-danger btn-sm" onclick="openDeleteUser(${u.userId},'${u.name.replace(/'/g,"\\'")}')">Delete</button>`
+                        : '<span style="font-size:11px;color:var(--light-grey);">You</span>'}
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function openDeleteUser(id, name) {
+        userToDelete = id;
+        document.getElementById('deleteUserName').textContent = name;
+        openModal('deleteUserModal');
+    }
+
+    function confirmDeleteUser() {
+        if (!userToDelete) return;
+        fetch(`/api/users/${userToDelete}`, { method: 'DELETE' })
+        .then(r => r.json())
+        .then(data => {
+            closeModal('deleteUserModal');
+            if (data.success) { showToast('✓ Customer deleted'); loadAllUsers(); loadDashboard(); }
+            else showAlert('userAlert', data.message || 'Failed to delete user.', 'error');
+        })
+        .catch(() => { closeModal('deleteUserModal'); showToast('Connection error'); });
+    }
+
+    // ===== REPORTS =====
+    function buildReports() {
+        const orders   = allOrders;
+        const products = allProducts;
+        const users    = allUsers;
+
+        const revenue = orders.reduce((s, o) => s + Number(o.totalAmount), 0);
+        const avgOrder = orders.length ? Math.round(revenue / orders.length) : 0;
+
+        document.getElementById('rTotalRevenue').textContent  = (revenue / 1000).toFixed(1) + 'K';
+        document.getElementById('rTotalOrders').textContent   = orders.length;
+        document.getElementById('rAvgOrder').textContent      = avgOrder.toLocaleString();
+        document.getElementById('rTotalCustomers').textContent = users.filter(u => u.role === 'CUSTOMER').length;
+
+        // Revenue by category
+        const catRevenue = {};
+        orders.forEach(o => {
+            const cat = o.productCategory || 'Other';
+            catRevenue[cat] = (catRevenue[cat] || 0) + Number(o.totalAmount);
+        });
+        const maxCat = Math.max(...Object.values(catRevenue), 1);
+        document.getElementById('categoryChart').innerHTML =
+            Object.entries(catRevenue).sort((a,b) => b[1]-a[1]).map(([cat, rev]) => `
+                <div class="bar-row">
+                    <div class="bar-label">${cat}</div>
+                    <div class="bar-track">
+                        <div class="bar-fill gold" style="width:${Math.round(rev/maxCat*100)}%"></div>
+                    </div>
+                    <div class="bar-val">Rs. ${(rev/1000).toFixed(1)}K</div>
+                </div>
+            `).join('') || '<div style="text-align:center;padding:20px;color:var(--grey);">No data yet.</div>';
+
+        // Order status breakdown
+        const statusCount = {};
+        orders.forEach(o => {
+            const s = o.status || 'Confirmed';
+            statusCount[s] = (statusCount[s] || 0) + 1;
+        });
+        const maxStatus = Math.max(...Object.values(statusCount), 1);
+        document.getElementById('statusChart').innerHTML =
+            Object.entries(statusCount).sort((a,b) => b[1]-a[1]).map(([s, cnt]) => `
+                <div class="bar-row">
+                    <div class="bar-label">${s}</div>
+                    <div class="bar-track">
+                        <div class="bar-fill" style="width:${Math.round(cnt/maxStatus*100)}%"></div>
+                    </div>
+                    <div class="bar-val">${cnt}</div>
+                </div>
+            `).join('') || '<div style="text-align:center;padding:20px;color:var(--grey);">No data yet.</div>';
+
+        // Top products by revenue
+        const productRevenue = {};
+        const productQty = {};
+        orders.forEach(o => {
+            const name = o.productName;
+            const cat  = o.productCategory || '';
+            productRevenue[name] = { rev: (productRevenue[name]?.rev || 0) + Number(o.totalAmount), cat };
+            productQty[name]     = (productQty[name] || 0) + Number(o.quantity);
+        });
+        const topProducts = Object.entries(productRevenue).sort((a,b) => b[1].rev - a[1].rev).slice(0, 10);
+        const maxRev = topProducts.length ? topProducts[0][1].rev : 1;
+        const tbody = document.getElementById('topProductsBody');
+        if (!topProducts.length) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--grey);padding:24px;">No sales data yet.</td></tr>';
+        } else {
+            tbody.innerHTML = topProducts.map(([name, data]) => `
+                <tr>
+                    <td style="font-weight:500;color:var(--black);">${name}</td>
+                    <td><span class="badge badge-dark">${data.cat}</span></td>
+                    <td>${productQty[name] || 0}</td>
+                    <td style="font-weight:600;">Rs. ${Number(data.rev).toLocaleString()}</td>
+                    <td>
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <div style="flex:1;background:var(--cream);height:8px;border-radius:2px;overflow:hidden;">
+                                <div style="height:100%;background:var(--accent);width:${Math.round(data.rev/maxRev*100)}%;border-radius:2px;"></div>
+                            </div>
+                            <span style="font-size:11px;color:var(--grey);">${Math.round(data.rev/maxRev*100)}%</span>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+    }
+</script>
+</body>
+</html>

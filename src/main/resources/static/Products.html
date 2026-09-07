@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop — Z A M A R</title>
+    <link rel="stylesheet" href="css/Style.css?v=3">
+</head>
+<body>
+
+<div class="announcement-bar">Free delivery on orders above Rs. 5,000</div>
+
+<nav class="navbar">
+    <div class="nav-left">
+        <a href="Index.html" class="nav-link">Home</a>
+        <a href="Products.html" class="nav-link">Shop All</a>
+    </div>
+    <a href="Index.html" class="logo">Z A M A R<span>Premium Menswear</span></a>
+    <div class="nav-right">
+        <a href="Login.html" class="nav-link" id="navLogin">Login</a>
+        <a href="Wishlist.html" class="nav-link" id="navWishlist">♡ <span class="wishlist-count">0</span></a>
+        <a href="Orders.html" class="nav-link hidden" id="navAccount">My Orders</a>
+        <a href="Profile.html" class="nav-link hidden" id="navProfile">Profile</a>
+        <a href="Admin.html" class="nav-link hidden" id="navAdmin">Admin</a>
+        <a href="#" class="nav-link hidden" id="navLogout" onclick="logout()">Logout</a>
+        <button class="nav-icon" onclick="openCart()">🛒<span class="cart-badge cart-count">0</span></button>
+    </div>
+</nav>
+
+<!-- Category Filter -->
+<div class="category-strip">
+    <div class="category-strip-inner" id="catStrip">
+        <button class="cat-pill active" onclick="filterCat('')">All</button>
+        <button class="cat-pill" onclick="filterCat('Shirts')">Shirts</button>
+        <button class="cat-pill" onclick="filterCat('Trousers')">Trousers</button>
+        <button class="cat-pill" onclick="filterCat('Suits')">Suits</button>
+        <button class="cat-pill" onclick="filterCat('Jackets')">Jackets</button>
+        <button class="cat-pill" onclick="filterCat('Accessories')">Accessories</button>
+    </div>
+</div>
+
+<div class="container" style="padding-top:32px;padding-bottom:80px;">
+
+    <!-- Top Bar -->
+    <div class="flex-between mb-24" style="flex-wrap:wrap;gap:16px;">
+        <div>
+            <h1 style="font-family:'Playfair Display',serif;font-size:28px;font-weight:400;" id="pageTitle">All Products</h1>
+            <p style="font-size:12px;color:var(--grey);margin-top:4px;" id="productCount"></p>
+        </div>
+        <div class="search-wrap" style="max-width:360px;margin-bottom:0;">
+            <input type="text" id="searchInput" placeholder="Search products...">
+            <button onclick="doSearch()">Search</button>
+        </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+        <label>Sort By</label>
+        <select id="sortSelect" onchange="applyFilters()">
+            <option value="">Default</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+            <option value="name-asc">Name: A → Z</option>
+            <option value="name-desc">Name: Z → A</option>
+            <option value="discount">On Sale First</option>
+        </select>
+
+        <label style="margin-left:8px;">Min Price</label>
+        <input type="number" id="minPrice" placeholder="0" min="0" onchange="applyFilters()">
+
+        <label>Max Price</label>
+        <input type="number" id="maxPrice" placeholder="Any" min="0" onchange="applyFilters()">
+
+        <label>
+            <input type="checkbox" id="inStockOnly" onchange="applyFilters()" style="margin-right:6px;">
+            In Stock Only
+        </label>
+
+        <label>
+            <input type="checkbox" id="onSaleOnly" onchange="applyFilters()" style="margin-right:6px;">
+            On Sale Only
+        </label>
+
+        <button class="btn btn-outline-dark btn-sm" onclick="clearFilters()">Clear</button>
+    </div>
+
+    <!-- Product Grid -->
+    <div class="product-grid" id="productGrid">
+        <div style="grid-column:1/-1;text-align:center;padding:80px;color:var(--grey);">Loading...</div>
+    </div>
+
+</div>
+
+<!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="footer-bottom">
+            <span>© 2026 Z A M A R. All rights reserved.</span>
+        </div>
+    </div>
+</footer>
+
+<!-- Cart Drawer -->
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+<div class="cart-drawer" id="cartDrawer">
+    <div class="cart-drawer-header">
+        <h3>Shopping Cart</h3>
+        <button class="cart-close" onclick="closeCart()">✕</button>
+    </div>
+    <div class="cart-drawer-body" id="cartDrawerBody"></div>
+    <div class="cart-drawer-footer" id="cartDrawerFooter" style="display:none;">
+        <div class="cart-subtotal"><span>Subtotal</span><span id="cartSubtotal">Rs. 0</span></div>
+        <div class="cart-total-row"><span>Total</span><span id="cartTotalAmt">Rs. 0</span></div>
+        <a href="Checkout.html" class="btn btn-dark btn-full" style="margin-bottom:10px;">Proceed to Checkout</a>
+        <button class="btn btn-outline-dark btn-full" onclick="closeCart()">Continue Shopping</button>
+    </div>
+</div>
+
+<!-- Quick View Modal -->
+<div class="modal-overlay" id="quickViewModal">
+    <div class="modal" style="max-width:780px;">
+        <div class="modal-header">
+            <h3>Quick View</h3>
+            <button class="modal-close" onclick="closeModal('quickViewModal')">✕</button>
+        </div>
+        <div class="modal-body" id="quickViewContent"></div>
+    </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="js/Main.js?v=3"></script>
+<script>
+    updateNav();
+    updateCartCount();
+    updateCartDrawer();
+
+    let allProducts = [];
+    let currentCat  = '';
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlCat = urlParams.get('cat') || '';
+    if (urlCat) {
+        currentCat = urlCat;
+        document.getElementById('pageTitle').textContent = urlCat;
+        document.querySelectorAll('.cat-pill').forEach(p => {
+            p.classList.toggle('active', p.textContent.trim() === urlCat);
+        });
+    }
+
+    fetch('/api/products')
+        .then(r => r.json())
+        .then(products => {
+            allProducts = products;
+            applyFilters();
+        })
+        .catch(() => {
+            document.getElementById('productGrid').innerHTML =
+                '<div style="grid-column:1/-1;text-align:center;padding:80px;color:var(--danger);">Could not load products.</div>';
+        });
+
+    function filterCat(cat) {
+        currentCat = cat;
+        document.querySelectorAll('.cat-pill').forEach(p => {
+            p.classList.toggle('active', cat === '' ? p.textContent.trim() === 'All' : p.textContent.trim() === cat);
+        });
+        document.getElementById('pageTitle').textContent = cat || 'All Products';
+        document.getElementById('searchInput').value = '';
+        applyFilters();
+    }
+
+    function doSearch() {
+        applyFilters();
+    }
+
+    function applyFilters() {
+        const q        = document.getElementById('searchInput').value.trim().toLowerCase();
+        const sort     = document.getElementById('sortSelect').value;
+        const minP     = parseFloat(document.getElementById('minPrice').value) || 0;
+        const maxP     = parseFloat(document.getElementById('maxPrice').value) || Infinity;
+        const inStock  = document.getElementById('inStockOnly').checked;
+        const onSale   = document.getElementById('onSaleOnly').checked;
+
+        let filtered = allProducts.filter(p => {
+            const fp = p.discountedPrice && p.discountedPrice < p.price ? p.discountedPrice : p.price;
+            const matchCat    = !currentCat || p.category === currentCat;
+            const matchSearch = !q || p.name.toLowerCase().includes(q) || (p.description && p.description.toLowerCase().includes(q));
+            const matchMin    = fp >= minP;
+            const matchMax    = fp <= maxP;
+            const matchStock  = !inStock  || p.stock > 0;
+            const matchSale   = !onSale   || (p.discountedPrice && p.discountedPrice < p.price);
+            return matchCat && matchSearch && matchMin && matchMax && matchStock && matchSale;
+        });
+
+        filtered = sortProducts(filtered, sort);
+        renderProducts(filtered);
+    }
+
+    function sortProducts(products, sort) {
+        const arr = [...products];
+        switch (sort) {
+            case 'price-asc':
+                return arr.sort((a, b) => effectivePrice(a) - effectivePrice(b));
+            case 'price-desc':
+                return arr.sort((a, b) => effectivePrice(b) - effectivePrice(a));
+            case 'name-asc':
+                return arr.sort((a, b) => a.name.localeCompare(b.name));
+            case 'name-desc':
+                return arr.sort((a, b) => b.name.localeCompare(a.name));
+            case 'discount':
+                return arr.sort((a, b) => {
+                    const aD = a.discountedPrice && a.discountedPrice < a.price ? 1 : 0;
+                    const bD = b.discountedPrice && b.discountedPrice < b.price ? 1 : 0;
+                    return bD - aD;
+                });
+            default:
+                return arr;
+        }
+    }
+
+    function effectivePrice(p) {
+        return (p.discountedPrice && p.discountedPrice < p.price) ? p.discountedPrice : p.price;
+    }
+
+    function clearFilters() {
+        document.getElementById('sortSelect').value = '';
+        document.getElementById('minPrice').value   = '';
+        document.getElementById('maxPrice').value   = '';
+        document.getElementById('inStockOnly').checked = false;
+        document.getElementById('onSaleOnly').checked  = false;
+        applyFilters();
+    }
+
+    function renderProducts(products) {
+        const grid = document.getElementById('productGrid');
+        document.getElementById('productCount').textContent = `${products.length} item${products.length !== 1 ? 's' : ''}`;
+        if (!products.length) {
+            grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:80px;color:var(--grey);">No products found.</div>';
+            return;
+        }
+        grid.innerHTML = products.map(p => productCardHTML(p)).join('');
+    }
+
+    document.getElementById('searchInput').addEventListener('keypress', e => {
+        if (e.key === 'Enter') applyFilters();
+    });
+</script>
+</body>
+</html>

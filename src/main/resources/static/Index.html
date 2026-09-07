@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Z A M A R — Premium Menswear Pakistan</title>
+    <link rel="stylesheet" href="css/Style.css?v=3">
+</head>
+<body>
+
+<!-- Announcement -->
+<div class="announcement-bar">
+    Free delivery on orders above Rs. 5,000 &nbsp;|&nbsp; New Winter Collection Now Available
+</div>
+
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="nav-left">
+        <a href="Index.html" class="nav-link">Home</a>
+        <a href="Products.html" class="nav-link">Shop All</a>
+    </div>
+    <a href="Index.html" class="logo">Z A M A R<span>Premium Menswear</span></a>
+    <div class="nav-right">
+        <a href="Login.html" class="nav-link" id="navLogin">Login</a>
+        <a href="Wishlist.html" class="nav-link" id="navWishlist">♡ <span class="wishlist-count">0</span></a>
+        <a href="Orders.html" class="nav-link hidden" id="navAccount">My Orders</a>
+        <a href="Profile.html" class="nav-link hidden" id="navProfile">Profile</a>
+        <a href="Admin.html" class="nav-link hidden" id="navAdmin">Admin</a>
+        <a href="#" class="nav-link hidden" id="navLogout" onclick="logout()">Logout</a>
+        <button class="nav-icon" onclick="openCart()" title="Cart">
+            🛒<span class="cart-badge cart-count">0</span>
+        </button>
+    </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+    <div class="hero-content">
+        <div class="hero-tag">New Winter Collection 2026</div>
+        <h1>Dress with<br><em>Confidence</em></h1>
+        <p>Discover premium menswear crafted for the modern gentleman. Shirts, suits, jackets and more.</p>
+        <div class="hero-btns">
+            <a href="Products.html" class="btn btn-gold">Shop Collection</a>
+            <a href="Products.html?cat=Suits" class="btn btn-outline">View Suits</a>
+        </div>
+    </div>
+</section>
+
+<!-- Category Strip -->
+<div class="category-strip">
+    <div class="category-strip-inner">
+        <a href="Products.html" class="cat-pill">All</a>
+        <a href="Products.html?cat=Shirts" class="cat-pill">Shirts</a>
+        <a href="Products.html?cat=Trousers" class="cat-pill">Trousers</a>
+        <a href="Products.html?cat=Suits" class="cat-pill">Suits</a>
+        <a href="Products.html?cat=Jackets" class="cat-pill">Jackets</a>
+        <a href="Products.html?cat=Accessories" class="cat-pill">Accessories</a>
+    </div>
+</div>
+
+<!-- Featured Products -->
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-tag">Curated Selection</span>
+            <h2 class="section-title">Featured Collection</h2>
+            <p class="section-sub">Handpicked premium pieces for every occasion</p>
+        </div>
+        <div class="product-grid" id="featuredGrid">
+            <div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--grey);">Loading collection...</div>
+        </div>
+        <div class="text-center mt-32">
+            <a href="Products.html" class="btn btn-outline-dark">View Full Collection</a>
+        </div>
+    </div>
+</section>
+
+<!-- Features -->
+<div class="features-strip">
+    <div class="container">
+        <div class="features-grid">
+            <div class="feature-item">
+                <span class="feature-icon"></span>
+                <div class="feature-title">Free Delivery</div>
+                <div class="feature-sub">On orders above Rs. 5,000</div>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon"></span>
+                <div class="feature-title">Easy Returns</div>
+                <div class="feature-sub">7-day return policy</div>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon"></span>
+                <div class="feature-title">100% Authentic</div>
+                <div class="feature-sub">Genuine quality guaranteed</div>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon"></span>
+                <div class="feature-title">Secure Payment</div>
+                <div class="feature-sub">Safe & encrypted checkout</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="footer-grid">
+            <div>
+                <div class="footer-logo">Z A M A R</div>
+                <p class="footer-desc">Premium menswear for the modern Pakistani gentleman. Quality you can feel, style you can see.</p>
+            </div>
+            <div>
+                <div class="footer-heading">Shop</div>
+                <ul class="footer-links">
+                    <li><a href="Products.html?cat=Shirts">Shirts</a></li>
+                    <li><a href="Products.html?cat=Trousers">Trousers</a></li>
+                    <li><a href="Products.html?cat=Suits">Suits</a></li>
+                    <li><a href="Products.html?cat=Jackets">Jackets</a></li>
+                    <li><a href="Products.html?cat=Accessories">Accessories</a></li>
+                </ul>
+            </div>
+            <div>
+                <div class="footer-heading">Account</div>
+                <ul class="footer-links">
+                    <li><a href="Login.html">Login</a></li>
+                    <li><a href="Register.html">Register</a></li>
+                    <li><a href="Orders.html">My Orders</a></li>
+                    <li><a href="Checkout.html">Checkout</a></li>
+                </ul>
+            </div>
+            <div>
+                <div class="footer-heading">Contact</div>
+                <ul class="footer-links">
+                    <li><a href="#">Karachi, Pakistan</a></li>
+                    <li><a href="#">support@zamar.pk</a></li>
+                    <li><a href="#">+92 3123794282</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>© 2026 Z A M A R. All rights reserved.</span>
+        </div>
+    </div>
+</footer>
+
+<!-- Cart Drawer -->
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+<div class="cart-drawer" id="cartDrawer">
+    <div class="cart-drawer-header">
+        <h3>Shopping Cart</h3>
+        <button class="cart-close" onclick="closeCart()">✕</button>
+    </div>
+    <div class="cart-drawer-body" id="cartDrawerBody"></div>
+    <div class="cart-drawer-footer" id="cartDrawerFooter" style="display:none;">
+        <div class="cart-subtotal">
+            <span>Subtotal</span><span id="cartSubtotal">Rs. 0</span>
+        </div>
+        <div class="cart-total-row">
+            <span>Total</span><span id="cartTotalAmt">Rs. 0</span>
+        </div>
+        <a href="Checkout.html" class="btn btn-dark btn-full" style="margin-bottom:10px;">Proceed to Checkout</a>
+        <button class="btn btn-outline-dark btn-full" onclick="closeCart()">Continue Shopping</button>
+    </div>
+</div>
+
+<!-- Quick View Modal -->
+<div class="modal-overlay" id="quickViewModal">
+    <div class="modal" style="max-width:780px;">
+        <div class="modal-header">
+            <h3>Quick View</h3>
+            <button class="modal-close" onclick="closeModal('quickViewModal')">✕</button>
+        </div>
+        <div class="modal-body" id="quickViewContent"></div>
+    </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="js/Main.js?v=3"></script>
+<script>
+    updateNav();
+    updateCartCount();
+    updateCartDrawer();
+
+    fetch('/api/products')
+        .then(r => r.json())
+        .then(products => {
+            const grid = document.getElementById('featuredGrid');
+            if (!products.length) {
+                grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--grey);">No products found.</div>';
+                return;
+            }
+            // Show first 8
+            grid.innerHTML = products.slice(0,8).map(p => productCardHTML(p)).join('');
+        })
+        .catch(() => {
+            document.getElementById('featuredGrid').innerHTML =
+                '<div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--danger);">Could not load products. Please start the backend server.</div>';
+        });
+</script>
+</body>
+</html>

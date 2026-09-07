@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register — Z A M A R</title>
+    <link rel="stylesheet" href="css/Style.css?v=3">
+</head>
+<body>
+<div class="auth-wrap">
+    <div class="auth-visual">
+        <div class="auth-visual-content">
+            <div style="font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--accent-light);margin-bottom:24px;">Join Us</div>
+            <h2>Become Part of<br><em>The Family</em></h2>
+            <p style="margin-top:20px;">Create your account and enjoy<br>exclusive member benefits.</p>
+            <div style="margin-top:40px;padding:20px;border:1px solid rgba(255,255,255,0.1);">
+                <div style="font-size:12px;color:rgba(255,255,255,0.5);line-height:2;">
+                    ✓ Free delivery on orders above Rs. 5,000<br>
+                    ✓ Order tracking & history<br>
+                    ✓ Exclusive member discounts<br>
+                    ✓ Early access to new collections
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="auth-form-wrap">
+        <div class="auth-form">
+            <div class="auth-logo">Z A M A R</div>
+            <div class="auth-subtitle">Create your account</div>
+
+            <div class="alert" id="alertMsg"></div>
+
+            <div class="form-group">
+                <label class="form-label">Full Name</label>
+                <input type="text" class="form-control" id="name" placeholder="Muhammad Umer">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <input type="email" class="form-control" id="email" placeholder="you@example.com">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Phone Number</label>
+                <input type="tel" class="form-control" id="phone" placeholder="+92 300 0000000">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <input type="password" class="form-control" id="password"
+                       placeholder="Min 8 chars, uppercase, lowercase, number"
+                       oninput="checkStrength(this.value)">
+
+                <div class="form-group">
+                    <label class="form-label">Confirm Password</label>
+                    <input type="password" class="form-control" id="confirmPassword" placeholder="Repeat password">
+                </div>
+                <!-- Strength Bar -->
+                <div style="margin-top:8px;">
+                    <div style="display:flex;gap:4px;margin-bottom:6px;">
+                        <div id="bar1" style="height:3px;flex:1;background:var(--border);border-radius:2px;transition:background 0.3s;"></div>
+                        <div id="bar2" style="height:3px;flex:1;background:var(--border);border-radius:2px;transition:background 0.3s;"></div>
+                        <div id="bar3" style="height:3px;flex:1;background:var(--border);border-radius:2px;transition:background 0.3s;"></div>
+                        <div id="bar4" style="height:3px;flex:1;background:var(--border);border-radius:2px;transition:background 0.3s;"></div>
+                    </div>
+                    <div id="strengthText" style="font-size:11px;color:var(--grey);letter-spacing:0.5px;"></div>
+                </div>
+            </div>
+
+            <button class="btn btn-dark btn-full" onclick="doRegister()" style="margin-top:8px;">Create Account</button>
+
+            <div class="auth-link">
+                Already have an account? <a href="Login.html">Sign in</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="toast"></div>
+<script src="js/Main.js?v=3"></script>
+<script>
+    function doRegister() {
+    const name            = document.getElementById('name').value.trim();
+    const email           = document.getElementById('email').value.trim();
+    const phone           = document.getElementById('phone').value.trim();
+    const password        = document.getElementById('password').value.trim();
+    const confirmPassword = document.getElementById('confirmPassword').value.trim();
+
+    // ===== EMPTY CHECK =====
+    if (!name || !email || !phone || !password || !confirmPassword) {
+        showAlert('alertMsg', 'Please fill all fields.', 'error');
+        return;
+    }
+
+    // ===== PASSWORD LENGTH CHECK =====
+    if (password.length < 8) {
+        showAlert('alertMsg', 'Password must be at least 8 characters.', 'error');
+        return;
+    }
+
+    // ===== UPPERCASE CHECK =====
+    if (!/[A-Z]/.test(password)) {
+        showAlert('alertMsg', 'Password must contain at least one uppercase letter (A-Z).', 'error');
+        return;
+    }
+
+    // ===== LOWERCASE CHECK =====
+    if (!/[a-z]/.test(password)) {
+        showAlert('alertMsg', 'Password must contain at least one lowercase letter (a-z).', 'error');
+        return;
+    }
+
+    // ===== NUMBER CHECK =====
+    if (!/[0-9]/.test(password)) {
+        showAlert('alertMsg', 'Password must contain at least one number (0-9).', 'error');
+        return;
+    }
+
+    // ===== CONFIRM PASSWORD CHECK =====
+    if (password !== confirmPassword) {
+        showAlert('alertMsg', 'Passwords do not match.', 'error');
+        return;
+    }
+
+    // ===== SHOW LOADING =====
+    const btn = document.querySelector('button[onclick="doRegister()"]');
+    if (btn) { btn.textContent = 'Creating...'; btn.disabled = true; }
+
+    fetch('/api/users/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, phone, password, role: 'CUSTOMER' })
+    })
+    .then(r => {
+        if (!r.ok) throw new Error('Server error');
+        return r.json();
+    })
+    .then(data => {
+        if (btn) { btn.textContent = 'Create Account'; btn.disabled = false; }
+        if (data.success) {
+            showAlert('alertMsg', 'Account created! Redirecting to login...', 'success');
+            setTimeout(() => window.location.href = 'Login.html', 1500);
+        } else {
+            showAlert('alertMsg', data.message || 'Registration failed.', 'error');
+        }
+    })
+    .catch(() => {
+        if (btn) { btn.textContent = 'Create Account'; btn.disabled = false; }
+        showAlert('alertMsg', 'Unable to connect. Please try again later.', 'error');
+    });
+}
+    function checkStrength(password) {
+    let score = 0;
+    const bar1 = document.getElementById('bar1');
+    const bar2 = document.getElementById('bar2');
+    const bar3 = document.getElementById('bar3');
+    const bar4 = document.getElementById('bar4');
+    const text = document.getElementById('strengthText');
+
+    if (!password) {
+        [bar1,bar2,bar3,bar4].forEach(b => b.style.background = 'var(--border)');
+        text.textContent = '';
+        return;
+    }
+
+    if (password.length >= 8)      score++;
+    if (/[A-Z]/.test(password))    score++;
+    if (/[a-z]/.test(password))    score++;
+    if (/[0-9]/.test(password))    score++;
+
+    const colors = {
+        1: '#e74c3c',
+        2: '#e67e22',
+        3: '#f1c40f',
+        4: '#27ae60'
+    };
+
+    const labels = {
+        1: 'Weak',
+        2: 'Fair',
+        3: 'Good',
+        4: 'Strong'
+    };
+
+    const color = colors[score] || 'var(--border)';
+
+    bar1.style.background = score >= 1 ? color : 'var(--border)';
+    bar2.style.background = score >= 2 ? color : 'var(--border)';
+    bar3.style.background = score >= 3 ? color : 'var(--border)';
+    bar4.style.background = score >= 4 ? color : 'var(--border)';
+
+    text.style.color    = color;
+    text.textContent    = labels[score] || '';
+
+    // Show what's missing
+    const missing = [];
+    if (password.length < 8)     missing.push('8+ characters');
+    if (!/[A-Z]/.test(password)) missing.push('uppercase letter');
+    if (!/[a-z]/.test(password)) missing.push('lowercase letter');
+    if (!/[0-9]/.test(password)) missing.push('number');
+
+    if (missing.length > 0 && score < 4) {
+        text.textContent += ' — needs: ' + missing.join(', ');
+    }
+}
+</script>
+</body>
+</html>

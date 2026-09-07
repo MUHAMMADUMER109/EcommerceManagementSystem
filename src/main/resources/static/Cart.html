@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart — Z A M A R</title>
+    <link rel="stylesheet" href="css/Style.css?v=3">
+</head>
+<body>
+
+<div class="announcement-bar">Free delivery on orders above Rs. 5,000</div>
+
+<nav class="navbar">
+    <div class="nav-left">
+        <a href="Index.html" class="nav-link">Home</a>
+        <a href="Products.html" class="nav-link">Shop All</a>
+    </div>
+    <a href="Index.html" class="logo">Z A M A R<span>Premium Menswear</span></a>
+    <div class="nav-right">
+        <a href="Login.html" class="nav-link" id="navLogin">Login</a>
+        <a href="Wishlist.html" class="nav-link" id="navWishlist">♡ <span class="wishlist-count">0</span></a>
+        <a href="Orders.html" class="nav-link hidden" id="navAccount">My Orders</a>
+        <a href="Profile.html" class="nav-link hidden" id="navProfile">Profile</a>
+        <a href="Admin.html" class="nav-link hidden" id="navAdmin">Admin</a>
+        <a href="#" class="nav-link hidden" id="navLogout" onclick="logout()">Logout</a>
+        <button class="nav-icon" onclick="openCart()" title="Cart">
+            🛒<span class="cart-badge cart-count">0</span>
+        </button>
+    </div>
+</nav>
+
+<div class="container" style="padding-top:48px;padding-bottom:80px;">
+
+    <div class="flex-between mb-24" style="flex-wrap:wrap;gap:16px;">
+        <div>
+            <h1 style="font-family:'Playfair Display',serif;font-size:36px;font-weight:400;">Shopping Cart</h1>
+            <p style="font-size:13px;color:var(--grey);margin-top:6px;">Review your items before checkout</p>
+        </div>
+        <a href="Products.html" class="btn btn-outline-dark btn-sm">Continue Shopping</a>
+    </div>
+
+    <div id="cartPageContent"></div>
+
+</div>
+
+<!-- Cart Drawer -->
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+<div class="cart-drawer" id="cartDrawer">
+    <div class="cart-drawer-header">
+        <h3>Shopping Cart</h3>
+        <button class="cart-close" onclick="closeCart()">✕</button>
+    </div>
+    <div class="cart-drawer-body" id="cartDrawerBody"></div>
+    <div class="cart-drawer-footer" id="cartDrawerFooter" style="display:none;">
+        <div class="cart-subtotal"><span>Subtotal</span><span id="cartSubtotal">Rs. 0</span></div>
+        <div class="cart-total-row"><span>Total</span><span id="cartTotalAmt">Rs. 0</span></div>
+        <a href="Checkout.html" class="btn btn-dark btn-full" style="margin-bottom:10px;">Proceed to Checkout</a>
+        <button class="btn btn-outline-dark btn-full" onclick="closeCart()">Continue Shopping</button>
+    </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="js/Main.js?v=3"></script>
+<script>
+    updateNav();
+    updateCartCount();
+    updateCartDrawer();
+    renderCartPage();
+
+    function renderCartPage() {
+        const cart     = getCart();
+        const content  = document.getElementById('cartPageContent');
+        const DELIVERY = 250;
+
+        if (!cart.length) {
+            content.innerHTML = `
+                <div style="text-align:center;padding:80px 20px;border:1px solid var(--border);background:var(--white);">
+                    <div style="font-size:56px;margin-bottom:20px;">🛒</div>
+                    <h2 style="font-family:'Playfair Display',serif;font-size:28px;font-weight:400;margin-bottom:12px;">Your cart is empty</h2>
+                    <p style="font-size:14px;color:var(--grey);margin-bottom:28px;">Looks like you haven't added anything yet.</p>
+                    <a href="Products.html" class="btn btn-dark">Start Shopping</a>
+                </div>`;
+            return;
+        }
+
+        const subtotal  = cartTotal();
+        const delivery  = subtotal >= 5000 ? 0 : DELIVERY;
+        const total     = subtotal + delivery;
+
+        content.innerHTML = `
+        <div class="cart-page-inner" style="display:grid;grid-template-columns:1fr 360px;gap:32px;align-items:start;">
+
+            <!-- Items List -->
+            <div style="background:var(--white);border:1px solid var(--border);">
+                <div style="padding:20px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-weight:600;font-size:14px;">${cart.length} Item${cart.length !== 1 ? 's' : ''}</span>
+                    <button class="btn btn-outline-dark btn-sm" onclick="clearCart();renderCartPage()">Clear All</button>
+                </div>
+                <div id="cartItemsList"></div>
+            </div>
+
+            <!-- Order Summary -->
+            <div style="background:var(--white);border:1px solid var(--border);padding:28px;position:sticky;top:100px;">
+                <h3 style="font-family:'Playfair Display',serif;font-size:20px;font-weight:400;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border);">Order Summary</h3>
+
+                <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--grey);margin-bottom:10px;">
+                    <span>Subtotal</span><span>Rs. ${subtotal.toLocaleString()}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--grey);margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--border);">
+                    <span>Delivery</span>
+                    <span style="color:${delivery === 0 ? 'var(--success)' : 'inherit'}">
+                        ${delivery === 0 ? 'FREE' : 'Rs. ' + delivery.toLocaleString()}
+                    </span>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:20px;font-weight:700;font-family:'Playfair Display',serif;margin-bottom:24px;">
+                    <span>Total</span><span>Rs. ${total.toLocaleString()}</span>
+                </div>
+
+                ${subtotal < 5000 ? `
+                <div style="padding:12px;background:var(--cream);border:1px solid var(--border);margin-bottom:20px;font-size:12px;color:var(--grey);">
+                    Add Rs. ${(5000 - subtotal).toLocaleString()} more to get <strong>free delivery</strong>
+                </div>` : `
+                <div style="padding:12px;background:#f0faf4;border:1px solid #b8e0c8;margin-bottom:20px;font-size:12px;color:var(--success);font-weight:600;">
+                    ✓ You qualify for free delivery!
+                </div>`}
+
+                <a href="Checkout.html" class="btn btn-dark btn-full" style="margin-bottom:10px;">Proceed to Checkout</a>
+                <a href="Products.html" class="btn btn-outline-dark btn-full">Continue Shopping</a>
+            </div>
+        </div>`;
+
+        // Render items
+        document.getElementById('cartItemsList').innerHTML = cart.map(item => {
+            const imgContent = (item.imageUrl && item.imageUrl !== 'null' && item.imageUrl !== '')
+                ? `<img src="${item.imageUrl}" alt="${item.name}" style="width:100%;height:100%;object-fit:cover;"
+                       onerror="this.parentElement.innerHTML='<div style=\\'width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--light-grey);text-align:center;\\'>No<br>Image</div>'">`
+                : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--light-grey);letter-spacing:1px;text-transform:uppercase;text-align:center;">No<br>Image</div>`;
+
+            return `
+            <div style="display:grid;grid-template-columns:80px 1fr auto;gap:16px;align-items:center;padding:20px 24px;border-bottom:1px solid var(--border);">
+                <div style="width:80px;height:96px;overflow:hidden;background:var(--cream);">
+                    ${imgContent}
+                </div>
+                <div>
+                    <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--grey);margin-bottom:4px;">${item.category}</div>
+                    <div style="font-weight:600;font-size:15px;color:var(--black);margin-bottom:12px;">${item.name}</div>
+                    <div style="display:flex;align-items:center;gap:12px;">
+                        <div class="qty-controls" style="height:36px;">
+                            <button class="qty-btn" style="width:32px;height:36px;" onclick="cartPageChangeQty(${item.id},-1)">−</button>
+                            <div class="qty-display" style="width:40px;height:36px;">${item.qty}</div>
+                            <button class="qty-btn" style="width:32px;height:36px;" onclick="cartPageChangeQty(${item.id},1)">+</button>
+                        </div>
+                        <button onclick="cartPageRemove(${item.id})"
+                            style="background:none;border:none;font-size:12px;color:var(--grey);cursor:pointer;letter-spacing:0.5px;text-transform:uppercase;">
+                            Remove
+                        </button>
+                    </div>
+                </div>
+                <div style="text-align:right;min-width:100px;">
+                    <div style="font-weight:700;font-size:16px;color:var(--black);">Rs. ${(item.price * item.qty).toLocaleString()}</div>
+                    ${item.qty > 1 ? `<div style="font-size:11px;color:var(--grey);margin-top:2px;">Rs. ${Number(item.price).toLocaleString()} each</div>` : ''}
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    function cartPageChangeQty(id, delta) {
+        let cart = getCart();
+        const item = cart.find(i => Number(i.id) === Number(id));
+        if (!item) return;
+        item.qty += delta;
+        if (item.qty <= 0) cart = cart.filter(i => Number(i.id) !== Number(id));
+        saveCart(cart);
+        updateCartCount();
+        updateCartDrawer();
+        renderCartPage();
+    }
+
+    function cartPageRemove(id) {
+        removeFromCart(id);
+        renderCartPage();
+    }
+</script>
+</body>
+</html>

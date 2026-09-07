@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wishlist — Z A M A R</title>
+    <link rel="stylesheet" href="css/Style.css?v=3">
+</head>
+<body>
+
+<div class="announcement-bar">Free delivery on orders above Rs. 5,000</div>
+
+<nav class="navbar">
+    <div class="nav-left">
+        <a href="Index.html" class="nav-link">Home</a>
+        <a href="Products.html" class="nav-link">Shop All</a>
+    </div>
+    <a href="Index.html" class="logo">Z A M A R<span>Premium Menswear</span></a>
+    <div class="nav-right">
+        <a href="Login.html" class="nav-link" id="navLogin">Login</a>
+        <a href="Wishlist.html" class="nav-link" id="navWishlist">♡ <span class="wishlist-count">0</span></a>
+        <a href="Orders.html" class="nav-link hidden" id="navAccount">My Orders</a>
+        <a href="Profile.html" class="nav-link hidden" id="navProfile">Profile</a>
+        <a href="Admin.html" class="nav-link hidden" id="navAdmin">Admin</a>
+        <a href="#" class="nav-link hidden" id="navLogout" onclick="logout()">Logout</a>
+        <button class="nav-icon" onclick="openCart()">🛒<span class="cart-badge cart-count">0</span></button>
+    </div>
+</nav>
+
+<div class="container" style="padding-top:48px;padding-bottom:80px;">
+
+    <div class="flex-between mb-24" style="flex-wrap:wrap;gap:16px;">
+        <div>
+            <h1 style="font-family:'Playfair Display',serif;font-size:36px;font-weight:400;">My Wishlist</h1>
+            <p style="font-size:13px;color:var(--grey);margin-top:6px;" id="wishlistCount">0 items saved</p>
+        </div>
+        <div style="display:flex;gap:12px;">
+            <button class="btn btn-dark btn-sm" onclick="moveAllToCart()">Move All to Cart</button>
+            <button class="btn btn-outline-dark btn-sm" onclick="clearWishlistAll()">Clear All</button>
+        </div>
+    </div>
+
+    <div id="wishlistGrid" class="wishlist-grid">
+        <div style="grid-column:1/-1;text-align:center;padding:80px;color:var(--grey);">Loading...</div>
+    </div>
+
+</div>
+
+<footer>
+    <div class="container">
+        <div class="footer-bottom">
+            <span>© 2026 Z A M A R. All rights reserved.</span>
+        </div>
+    </div>
+</footer>
+
+<!-- Cart Drawer -->
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+<div class="cart-drawer" id="cartDrawer">
+    <div class="cart-drawer-header">
+        <h3>Shopping Cart</h3>
+        <button class="cart-close" onclick="closeCart()">✕</button>
+    </div>
+    <div class="cart-drawer-body" id="cartDrawerBody"></div>
+    <div class="cart-drawer-footer" id="cartDrawerFooter" style="display:none;">
+        <div class="cart-subtotal"><span>Subtotal</span><span id="cartSubtotal">Rs. 0</span></div>
+        <div class="cart-total-row"><span>Total</span><span id="cartTotalAmt">Rs. 0</span></div>
+        <a href="Checkout.html" class="btn btn-dark btn-full" style="margin-bottom:10px;">Proceed to Checkout</a>
+        <button class="btn btn-outline-dark btn-full" onclick="closeCart()">Continue Shopping</button>
+    </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="js/Main.js?v=3"></script>
+<script>
+    updateNav();
+    updateCartCount();
+    updateCartDrawer();
+    renderWishlistPage();
+
+    function renderWishlistPage() {
+        const wl   = getWishlist();
+        const grid = document.getElementById('wishlistGrid');
+        document.getElementById('wishlistCount').textContent =
+            `${wl.length} item${wl.length !== 1 ? 's' : ''} saved`;
+
+        if (!wl.length) {
+            grid.innerHTML = `
+                <div style="grid-column:1/-1;text-align:center;padding:80px 20px;">
+                    <div style="font-size:56px;margin-bottom:20px;opacity:0.3;">♡</div>
+                    <h3 style="font-family:'Playfair Display',serif;font-size:24px;font-weight:400;margin-bottom:12px;">Your wishlist is empty</h3>
+                    <p style="font-size:13px;color:var(--grey);margin-bottom:28px;">Save items you love to come back to them later.</p>
+                    <a href="Products.html" class="btn btn-dark">Browse Collection</a>
+                </div>`;
+            return;
+        }
+
+        grid.innerHTML = wl.map(item => {
+            const imgUrl = (item.imageUrl && item.imageUrl !== 'null') ? item.imageUrl : '';
+            const imgContent = imgUrl
+                ? `<img src="${imgUrl}" alt="${item.name}" style="width:100%;height:100%;object-fit:cover;"
+                       onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                   <div style="display:none;width:100%;height:100%;align-items:center;justify-content:center;background:var(--cream);">
+                       <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--light-grey);">No Image</div>
+                   </div>`
+                : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:var(--cream);">
+                       <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--light-grey);">No Image</div>
+                   </div>`;
+
+            const nameEsc = item.name.replace(/'/g, "\\'");
+            const imgEsc  = imgUrl.replace(/'/g, "\\'");
+
+            return `
+            <div class="product-card">
+                <div class="product-img" style="padding:0;overflow:hidden;position:relative;">
+                    ${imgContent}
+                    <button class="wishlist-btn active" onclick="removeAndRefresh(${item.id})"
+                        title="Remove from Wishlist" style="background:white;color:var(--danger);border-color:var(--danger);">♥</button>
+                </div>
+                <div class="product-info">
+                    <div class="product-category">${item.category}</div>
+                    <div class="product-name">${item.name}</div>
+                    <div class="product-price">
+                        <span class="price-current">Rs. ${Number(item.price).toLocaleString()}</span>
+                    </div>
+                    <button class="btn btn-dark btn-full" style="margin-top:14px;padding:12px;"
+                        onclick="addToCart(${item.id},'${nameEsc}',${item.price},'${item.category}','${imgEsc}');removeAndRefresh(${item.id})">
+                        Move to Cart
+                    </button>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    function removeAndRefresh(id) {
+        const wl = getWishlist().filter(i => Number(i.id) !== Number(id));
+        saveWishlist(wl);
+        updateWishlistCount();
+        renderWishlistPage();
+    }
+
+    function moveAllToCart() {
+        const wl = getWishlist();
+        if (!wl.length) return;
+        wl.forEach(item => {
+            const imgEsc = (item.imageUrl || '').replace(/'/g, "\\'");
+            addToCart(item.id, item.name, item.price, item.category, item.imageUrl || '');
+        });
+        saveWishlist([]);
+        updateWishlistCount();
+        renderWishlistPage();
+        showToast(`✓ ${wl.length} item${wl.length !== 1 ? 's' : ''} moved to cart`);
+    }
+
+    function clearWishlistAll() {
+        if (!getWishlist().length) return;
+        if (!confirm('Clear your entire wishlist?')) return;
+        saveWishlist([]);
+        updateWishlistCount();
+        renderWishlistPage();
+    }
+</script>
+</body>
+</html>
