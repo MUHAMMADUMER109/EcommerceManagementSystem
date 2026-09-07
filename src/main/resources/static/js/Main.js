@@ -258,7 +258,7 @@ function _buildMobileMenu() {
 
     // Shop links (always visible)
     items.push({ label: 'Shop', type: 'section' });
-    items.push({ href: 'Index.html',    text: 'Home' });
+    items.push({ href: 'index.html',    text: 'Home' });
     items.push({ href: 'Products.html', text: 'Shop All' });
     items.push({ href: 'Wishlist.html', text: `♡ Wishlist (${getWishlist().length})` });
 
