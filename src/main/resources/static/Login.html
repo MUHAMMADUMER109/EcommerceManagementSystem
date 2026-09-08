@@ -89,7 +89,7 @@
         if (data.success) {
             saveUser(data.user);
             showAlert('alertMsg','Login successful! Redirecting...','success');
-            setTimeout(() => window.location.href = data.user.role === 'ADMIN' ? 'Admin.html' : 'Index.html', 1000);
+            setTimeout(() => window.location.href = data.user.role === 'ADMIN' ? 'Admin.html' : 'index.html', 1000);
         } else {
             showAlert('alertMsg', data.message || 'Invalid email or password.','error');
         }

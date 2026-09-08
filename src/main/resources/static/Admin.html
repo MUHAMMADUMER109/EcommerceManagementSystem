@@ -16,14 +16,14 @@
             <div class="admin-brand-name">Z A M A R</div>
             <div class="admin-brand-role">Admin Panel</div>
         </div>
-        <button class="admin-nav-item active" onclick="showTab('dashboard')">📊 Dashboard</button>
-        <button class="admin-nav-item" onclick="showTab('products')">👔 Products</button>
-        <button class="admin-nav-item" onclick="showTab('orders')">📦 Orders</button>
-        <button class="admin-nav-item" onclick="showTab('discounts')">🏷️ Discounts</button>
-        <button class="admin-nav-item" onclick="showTab('users')">👥 Customers</button>
-        <button class="admin-nav-item" onclick="showTab('reports')">📈 Reports</button>
+        <button class="admin-nav-item active" onclick="showTab('dashboard')">Dashboard</button>
+        <button class="admin-nav-item" onclick="showTab('products')">Products</button>
+        <button class="admin-nav-item" onclick="showTab('orders')">Orders</button>
+        <button class="admin-nav-item" onclick="showTab('discounts')">Discounts</button>
+        <button class="admin-nav-item" onclick="showTab('users')">Customers</button>
+        <button class="admin-nav-item" onclick="showTab('reports')">Reports</button>
         <div style="margin-top:auto;padding-top:40px;">
-            <button class="admin-nav-item" onclick="window.location.href='Index.html'">🏪 View Store</button>
+            <button class="admin-nav-item" onclick="window.location.href='index.html'">View Store</button>
             <button class="admin-nav-item" onclick="logout()">↩ Logout</button>
         </div>
     </aside>
@@ -37,22 +37,18 @@
             <div class="admin-page-sub" id="dashGreeting">Welcome back, Admin</div>
             <div class="grid-4" style="margin-bottom:32px;">
                 <div class="stat-card gold">
-                    <span class="stat-icon">👔</span>
                     <div class="stat-value" id="statProducts">—</div>
                     <div class="stat-label">Total Products</div>
                 </div>
                 <div class="stat-card black">
-                    <span class="stat-icon">📦</span>
                     <div class="stat-value" id="statOrders">—</div>
                     <div class="stat-label">Total Orders</div>
                 </div>
                 <div class="stat-card red">
-                    <span class="stat-icon">⚠</span>
                     <div class="stat-value" id="statLowStock">—</div>
                     <div class="stat-label">Low Stock</div>
                 </div>
                 <div class="stat-card green">
-                    <span class="stat-icon">💰</span>
                     <div class="stat-value" id="statRevenue">—</div>
                     <div class="stat-label">Revenue (Rs.)</div>
                 </div>
@@ -61,7 +57,7 @@
             <!-- Low Stock Alert -->
             <div id="lowStockAlert" style="display:none;" class="admin-card" style="border-left:3px solid var(--danger);">
                 <div class="admin-card-header">
-                    <div class="admin-card-title" style="color:var(--danger);">⚠ Low Stock Alert</div>
+                    <div class="admin-card-title" style="color:var(--danger);">Low Stock Alert</div>
                     <button class="btn btn-outline-dark btn-sm" onclick="showTab('products')">Manage Products</button>
                 </div>
                 <div id="lowStockList" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
@@ -542,16 +538,16 @@
             </div>
 
             <div class="admin-mob-section-label">Manage</div>
-            <button class="admin-mob-item active" data-tab="dashboard">📊 &nbsp; Dashboard</button>
-            <button class="admin-mob-item" data-tab="products">👔 &nbsp; Products</button>
-            <button class="admin-mob-item" data-tab="orders">📦 &nbsp; Orders</button>
-            <button class="admin-mob-item" data-tab="discounts">🏷️ &nbsp; Discounts</button>
-            <button class="admin-mob-item" data-tab="users">👥 &nbsp; Customers</button>
-            <button class="admin-mob-item" data-tab="reports">📈 &nbsp; Reports</button>
+            <button class="admin-mob-item active" data-tab="dashboard">&nbsp; Dashboard</button>
+            <button class="admin-mob-item" data-tab="products">&nbsp; Products</button>
+            <button class="admin-mob-item" data-tab="orders">&nbsp; Orders</button>
+            <button class="admin-mob-item" data-tab="discounts">&nbsp; Discounts</button>
+            <button class="admin-mob-item" data-tab="users">&nbsp; Customers</button>
+            <button class="admin-mob-item" data-tab="reports">&nbsp; Reports</button>
 
             <div class="admin-mob-divider"></div>
             <div class="admin-mob-section-label">Store</div>
-            <button class="admin-mob-item" onclick="window.location.href='Index.html'">🏪 &nbsp; View Store</button>
+            <button class="admin-mob-item" onclick="window.location.href='index.html'">&nbsp; View Store</button>
             <button class="admin-mob-item danger" onclick="logout()">↩ &nbsp; Logout</button>
         `;
         document.body.appendChild(menu);
